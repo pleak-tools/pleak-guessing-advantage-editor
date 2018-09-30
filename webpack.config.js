@@ -165,7 +165,7 @@ module.exports = {
   },
   "output": {
     "path": path.join(process.cwd(), "dist"),
-    "publicPath": configJson.policy_editor.folder + "/dist/",
+    "publicPath": configJson.guessing_advantage_editor.folder + "/dist/",
     "filename": "[name].bundle.js",
     "chunkFilename": "[id].chunk.js",
     "crossOriginLoading": false

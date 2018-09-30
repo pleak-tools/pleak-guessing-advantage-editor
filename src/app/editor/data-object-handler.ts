@@ -10,7 +10,6 @@ declare function require(name:string);
 let config = require('../../config.json');
 
 let schemaCodeMirror;
-let policyCodeMirror;
 let DBJexcel;
 
 export class DataObjectHandler {
@@ -62,21 +61,12 @@ export class DataObjectHandler {
     return inputSchema;
   }
 
-  getDataObjectInputPolicy() {
-    let inputPolicy = "";
-    if (this.dataObject.sqlDataObjectInfo != null) {
-      let savedData = JSON.parse(this.dataObject.sqlDataObjectInfo);
-      inputPolicy = savedData.inputPolicy;
-    }
-    return inputPolicy;
-  }
-
   initDataObjectOptionsEditProcess() {
     this.loadDataObjectOptionsPanelTemplate();
   }
 
   areThereUnsavedDataObjectChanges() {
-    if (this.getDataObjectInputSchema() != schemaCodeMirror.getValue() || this.getDataObjectInputPolicy() != policyCodeMirror.getValue() || this.DBInputInitialValue.toString() != $('#DBinputTable').jexcel('getData', false).toString()) {
+    if (this.getDataObjectInputSchema() != schemaCodeMirror.getValue() || this.DBInputInitialValue.toString() != $('#DBinputTable').jexcel('getData', false).toString()) {
       return true;
     } else {
       return false;
@@ -120,13 +110,11 @@ export class DataObjectHandler {
     }
 
     let savedData;
-    let inputPolicy = "";
     let inputDB = [];
     let inputSchema = "";
     if (this.dataObject.sqlDataObjectInfo != null) {
       savedData = JSON.parse(this.dataObject.sqlDataObjectInfo);
       inputSchema = savedData.inputSchema;
-      inputPolicy = savedData.inputPolicy;
       inputDB = savedData.inputDB;
     }
 
@@ -143,18 +131,6 @@ export class DataObjectHandler {
       inputSchema = "";
     }
     schemaCodeMirror.setValue(inputSchema);
-
-    this.dataObjectOptionsPanelContainer.find('#data-object-policyInput').val(inputPolicy);
-    policyCodeMirror = CodeMirror.fromTextArea(document.getElementById("data-object-policyInput"), {
-      readOnly: !this.elementsHandler.canEdit,
-      lineNumbers: false,
-      showCursorWhenSelecting: true,
-      lineWiseCopyCut: false
-    });
-    if (inputPolicy == null) {
-      inputPolicy = "";
-    }
-    policyCodeMirror.setValue(inputPolicy);
 
     $('.jexcel').remove();
     DBJexcel = null;
@@ -173,7 +149,6 @@ export class DataObjectHandler {
     this.DBInputInitialValue = $('#DBinputTable').jexcel('getData', false);
 
     setTimeout(function() {
-      policyCodeMirror.refresh();
       schemaCodeMirror.refresh();
     }, 10);
 
@@ -191,27 +166,24 @@ export class DataObjectHandler {
 
   getPreparedQueries() {
     let savedData;
-    let inputSchema, inputPolicy, inputDB = "";
+    let inputSchema, inputDB = "";
     if (this.dataObject.sqlDataObjectInfo != null) {
       savedData = JSON.parse(this.dataObject.sqlDataObjectInfo);
       inputSchema = savedData.inputSchema;
-      inputPolicy = savedData.inputPolicy;
       inputDB = savedData.inputDB;
     }
     if (inputDB) {
-      let policyOutput = inputPolicy;
       let DBOutput = "";
       let schemaOutput = inputSchema;
       for (let row of inputDB) {
         for (let col of row) {
           DBOutput += col + " ";
         }
-        DBOutput = DBOutput + "\n";
+        DBOutput = DBOutput.trim() + "\n";
       }
       DBOutput = DBOutput.trim();
       let name = this.dataObject.name.trim().replace(/ *\([^)]*\) */g, "").replace(/\s+/g, "_");
-
-      return {id: this.dataObject.id, name: name, policy: policyOutput, db: DBOutput, schema: schemaOutput};
+      return {id: this.dataObject.id, name: name, db: DBOutput, schema: schemaOutput};
     }
   }
 
@@ -219,7 +191,7 @@ export class DataObjectHandler {
     if ($('#input-options').has('#data-object-options-panel').length) {
       this.initDataObjectOptionsPanel();
     } else {
-      $('#input-options').prepend($('<div>').load(config.frontend.host + '/' + config.policy_editor.folder + '/src/app/editor/templates/data-object-options-panel.html', () => {
+      $('#input-options').prepend($('<div>').load(config.frontend.host + '/' + config.guessing_advantage_editor.folder + '/src/app/editor/templates/data-object-options-panel.html', () => {
         this.initDataObjectOptionsPanel();
       }));
     }
@@ -243,9 +215,20 @@ export class DataObjectHandler {
   updateDataObjectOptions() {
     let inputNRM = this.getDataObjectInputNRM();
     let inputSchema = schemaCodeMirror.getValue();
-    let inputPolicy = policyCodeMirror.getValue();
     let inputDB = $('#DBinputTable').jexcel('getData', false);
-    let object = {inputNRM: inputNRM, inputPolicy: inputPolicy, inputDB: inputDB, inputSchema: inputSchema};
+    let cleanedInputDB = [];
+    for (let row of inputDB) {
+      let cleanedRow = [];
+      for (let cell of row) {
+        if (cell.length > 0) {
+          cleanedRow.push(cell.trim());
+        }
+      }
+      if (cleanedRow.length > 0) {
+        cleanedInputDB.push(cleanedRow);
+      }
+    }
+    let object = {inputNRM: inputNRM, inputDB: cleanedInputDB, inputSchema: inputSchema};
     this.dataObject.sqlDataObjectInfo = JSON.stringify(object);
   }
 

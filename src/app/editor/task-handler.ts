@@ -168,7 +168,7 @@ export class TaskHandler {
     if ($('#input-options').has('#task-options-panel').length) {
       this.initTaskOptionsPanel();
     } else {
-      $('#input-options').prepend($('<div>').load(config.frontend.host + '/' + config.policy_editor.folder + '/src/app/editor/templates/task-options-panel.html', () => {
+      $('#input-options').prepend($('<div>').load(config.frontend.host + '/' + config.guessing_advantage_editor.folder + '/src/app/editor/templates/task-options-panel.html', () => {
         this.initTaskOptionsPanel();
       }));
     }

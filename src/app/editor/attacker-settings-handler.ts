@@ -1,7 +1,5 @@
 import * as Viewer from 'bpmn-js/lib/NavigatedViewer';
 
-import { ElementsHandler } from "./elements-handler";
-
 declare let $: any;
 declare let CodeMirror: any;
 
@@ -67,7 +65,7 @@ export class AttackerSettingsHandler {
     if ($('#sidebar').has('#attacker-settings-panel').length) {
       this.initAttackerSettingsPanel();
     } else {
-      $('#sidebar').append($('<div>').load(config.frontend.host + '/' + config.policy_editor.folder + '/src/app/editor/templates/attacker-settings-panel.html', () => {
+      $('#sidebar').append($('<div>').load(config.frontend.host + '/' + config.guessing_advantage_editor.folder + '/src/app/editor/templates/attacker-settings-panel.html', () => {
         this.initAttackerSettingsPanel();
       }));
     }
@@ -124,9 +122,13 @@ export class AttackerSettingsHandler {
 
   updateAttackerSettings() {
     let attackerKnowledge = attackerKnowledgeCodeMirror.getValue();
-    let object = {attackerKnowledge: attackerKnowledge};
+    let sensitiveAttributes = "";
     let root = this.registry.get('Process_1');
     if (root && root.businessObject) {
+      if (root.businessObject.policyInfo != null) {
+        sensitiveAttributes = JSON.parse(root.businessObject.policyInfo).sensitiveAttributes;
+      }
+      let object = {attackerKnowledge: attackerKnowledge, sensitiveAttributes: sensitiveAttributes};
       root.businessObject.policyInfo = JSON.stringify(object);
     }
   }

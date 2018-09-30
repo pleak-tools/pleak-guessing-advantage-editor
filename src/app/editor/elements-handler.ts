@@ -4,6 +4,7 @@ import { AnalysisHandler } from './analysis-handler';
 import { TaskHandler } from "./task-handler";
 import { DataObjectHandler } from "./data-object-handler";
 import { AttackerSettingsHandler } from './attacker-settings-handler';
+import { SensitiveAttributesHandler } from './sensitive-attributes-handler';
 
 declare let $: any;
 let is = (element, type) => element.$instanceOf(type);
@@ -32,6 +33,7 @@ export class ElementsHandler {
   analysisHandler: AnalysisHandler;
 
   attackerSettingsHandler: AttackerSettingsHandler;
+  sensitiveAttributesHandler: SensitiveAttributesHandler;
 
   taskHandlers: TaskHandler[] = [];
   dataObjectHandlers: DataObjectHandler[] = [];
@@ -88,6 +90,7 @@ export class ElementsHandler {
     });
     this.analysisHandler = new AnalysisHandler(this.viewer, this.diagram, this);
     this.attackerSettingsHandler = new AttackerSettingsHandler(this.viewer, this.diagram, this);
+    this.sensitiveAttributesHandler = new SensitiveAttributesHandler(this.viewer, this.diagram, this);
     this.prepareParser();
   }
 
@@ -218,6 +221,9 @@ export class ElementsHandler {
   // Check for unsaved changes on model
   areThereUnsavedChangesOnModel() {
     if (this.attackerSettingsHandler.areThereUnsavedChanges()) {
+      return true;
+    }
+    if (this.sensitiveAttributesHandler.areThereUnsavedChanges()) {
       return true;
     }
     let beingEditedElementHandler = this.taskHandlers.filter(function( obj ) {

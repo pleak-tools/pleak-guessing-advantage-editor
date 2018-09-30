@@ -2,7 +2,7 @@
   <div>
     <div class="row">
       <div class="col-xs-5">
-        <h4 class="editor-title">Pleak policy editor</h4>
+        <h4 class="editor-title">Pleak guessing advantage editor</h4>
       </div>
       <div class="col-xs-7 buttons-container">
         <ul class="buttons">
@@ -19,7 +19,7 @@
             </a>
           </li>
         </ul>
-        <ul class="buttons analyze">
+        <ul class="buttons analyze" *ngIf="isLoaded()">
           <li>
             <a class="active .analyze-button" id="analyze-diagram" title="analyze BPMN diagram" href="#">
               <span class="glyphicon glyphicon-check"></span> Analyze
@@ -103,7 +103,16 @@
           <ul class="buttons">
             <li>
               <a>
-                <span class="glyphicon glyphicon-transfer"></span> Policy Analyzer
+                <span class="glyphicon glyphicon-transfer"></span> Guessing Advantage Analyzer
+              </a>
+            </li>
+          </ul>
+          <br>
+          <br>
+          <ul class="buttons">
+            <li>
+              <a class="active" href="/combined-sensitivity-editor/{{viewerType == 'public' ? 'viewer/' : ''}}{{modelId}}">
+                <span class="glyphicon glyphicon-transfer"></span> Combined Sensitivity Analyzer
               </a>
             </li>
           </ul>

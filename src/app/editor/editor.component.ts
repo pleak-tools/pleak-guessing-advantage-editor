@@ -14,7 +14,7 @@ let pg_parser = require("exports-loader?Module!pgparser/pg_query.js");
 let config = require('../../config.json');
 
 @Component({
-  selector: 'app-policy-editor',
+  selector: 'app-guessing-advantage-editor',
   templateUrl: './editor.component.html',
   styleUrls: ['./editor.component.less']
 })
@@ -90,7 +90,7 @@ export class EditorComponent implements OnInit {
           self.openDiagram(self.file.content);
         }
         self.lastContent = self.file.content;
-        document.title = 'Pleak policy editor - ' + self.file.title;
+        document.title = 'Pleak guessing advantage editor - ' + self.file.title;
         $('#fileName').text(this.file.title);
         self.lastModified = new Date().getTime();
       },

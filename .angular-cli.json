@@ -1,7 +1,7 @@
 {
   "$schema": "./node_modules/@angular/cli/lib/config/schema.json",
   "project": {
-    "name": "pleak-policy-editor",
+    "name": "pleak-guessing-advantage-editor",
     "ejected": true
   },
   "apps": [

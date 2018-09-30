@@ -31,7 +31,7 @@ export class AnalysisHandler {
   editor: any;
   elementsHandler: any;
 
-  analysisInput: any = {children: [], queries: "", epsilon: 0.3, beta: 0.2, schemas: "", attackerSettings: ""};
+  analysisInput: any = {children: [], queries: "", epsilon: 0.3, beta: 0.2, schemas: "", attackerSettings: "", sensitiveAttributes: ""};
   analysisResult: any = null;
   analysisInputTasksOrder: any = [];
 
@@ -40,13 +40,13 @@ export class AnalysisHandler {
 
   init() {
     // No changes in model, so show previous analysis results
-    if (!this.getChangesInModelStatus() && Number.parseFloat(this.analysisInput.epsilon) == Number.parseFloat($('.advantage-input').val()) && this.analysisInput.attackerSettings == this.elementsHandler.attackerSettingsHandler.getAttackerSettings()) {
+    if (!this.getChangesInModelStatus() && Number.parseFloat(this.analysisInput.epsilon) == Number.parseFloat($('.advantage-input').val()) && this.analysisInput.attackerSettings == this.elementsHandler.attackerSettingsHandler.getAttackerSettings() && this.analysisInput.sensitiveAttributes == this.elementsHandler.sensitiveAttributesHandler.getSensitiveAttributes()) {
       this.showAnalysisResults();
       return;
     }
 
     // Changes in model, so run new analysis
-    this.analysisInput = {children: [], queries: "", epsilon: 0.3, beta: 0.2, schemas: "", attackerSettings: ""};
+    this.analysisInput = {children: [], queries: "", epsilon: 0.3, beta: 0.2, schemas: "", attackerSettings: "", sensitiveAttributes: ""};
     let counter = this.getAllModelTaskHandlers().length;
     this.analysisErrors = [];
     for (let taskId of this.getAllModelTaskHandlers().map(a => a.task.id)) {
@@ -61,7 +61,7 @@ export class AnalysisHandler {
     if ($('#sidebar').has('#analysis-panel').length) {
       this.initAnalysisPanels();
     } else {
-      $('#sidebar').prepend($('<div>').load(config.frontend.host + '/' + config.policy_editor.folder + '/src/app/editor/templates/analysis-panels.html', () => {
+      $('#sidebar').prepend($('<div>').load(config.frontend.host + '/' + config.guessing_advantage_editor.folder + '/src/app/editor/templates/analysis-panels.html', () => {
         this.initAnalysisPanels();
       }));
     }
@@ -99,6 +99,11 @@ export class AnalysisHandler {
       let percent = Math.round($('#attacker-advantage-input').val() * 100);
       $('#analysis-panel').find('#attacker-advantage-label').text(percent);
     });
+    $('#analysis-panel').on('click', '#sensitive-attributes-button', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      this.elementsHandler.sensitiveAttributesHandler.initSensitiveAttributesEditProcess();
+    });
   }
 
   // Format analyser input and send it to the analyser
@@ -114,10 +119,15 @@ export class AnalysisHandler {
       for (let inputId of inputIds) {
         let dataObjectQueries = this.getPreparedQueriesOfDataObjectByDataObjectId(inputId);
         if (dataObjectQueries) {
-          this.analysisInput.children.push(dataObjectQueries);
-          if (dataObjectQueries.schema) {
-            let schema = dataObjectQueries.schema + "\n";
-            schemasQuery += schema;
+          let alreadyAddedDataObject = this.analysisInput.children.filter(function( obj ) {
+            return obj.id == inputId;
+          });
+          if (alreadyAddedDataObject.length === 0) {
+            this.analysisInput.children.push(dataObjectQueries);
+            if (dataObjectQueries.schema) {
+              let schema = dataObjectQueries.schema + "\n";
+             schemasQuery += schema;
+            }
           }
         }
       }
@@ -132,6 +142,7 @@ export class AnalysisHandler {
           this.analysisInput.epsilon = Number.parseFloat($('.advantage-input').val());
           this.analysisInput.beta = 0.2;
           this.analysisInput.attackerSettings = this.elementsHandler.attackerSettingsHandler.getAttackerSettings();
+          this.analysisInput.sensitiveAttributes = this.elementsHandler.sensitiveAttributesHandler.getSensitiveAttributes();
           $('.analysis-spinner').fadeIn();
           $('#analysis-results-panel-content').html('');
           this.runAnalysisREST(this.analysisInput);
@@ -149,7 +160,7 @@ export class AnalysisHandler {
 
   // Call to the analyser
   runAnalysisREST(postData: any) {
-    this.editor.http.post(config.backend.host + '/rest/sql-privacy/analyze-policy', postData, this.editor.authService.loadRequestOptions()).subscribe(
+    this.editor.http.post(config.backend.host + '/rest/sql-privacy/analyze-guessing-advantage', postData, this.editor.authService.loadRequestOptions()).subscribe(
       success => {
         this.formatAnalysisResults(success);
       },
