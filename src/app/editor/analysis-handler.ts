@@ -31,7 +31,7 @@ export class AnalysisHandler {
   editor: any;
   elementsHandler: any;
 
-  analysisInput: any = {children: [], queries: "", epsilon: 0.3, beta: 0.2, schemas: "", attackerSettings: "", sensitiveAttributes: ""};
+  analysisInput: any = {children: [], queries: "", epsilon: 0.3, schemas: "", attackerSettings: "", sensitiveAttributes: ""};
   analysisResult: any = null;
   analysisInputTasksOrder: any = [];
 
@@ -46,7 +46,7 @@ export class AnalysisHandler {
     }
 
     // Changes in model, so run new analysis
-    this.analysisInput = {children: [], queries: "", epsilon: 0.3, beta: 0.2, schemas: "", attackerSettings: "", sensitiveAttributes: ""};
+    this.analysisInput = {children: [], queries: "", epsilon: 0.3, schemas: "", attackerSettings: "", sensitiveAttributes: ""};
     let counter = this.getAllModelTaskHandlers().length;
     this.analysisErrors = [];
     for (let taskId of this.getAllModelTaskHandlers().map(a => a.task.id)) {
@@ -140,7 +140,6 @@ export class AnalysisHandler {
         if (this.analysisErrors.length === 0) {
           this.analysisInput.queries.trim();
           this.analysisInput.epsilon = Number.parseFloat($('.advantage-input').val());
-          this.analysisInput.beta = 0.2;
           this.analysisInput.attackerSettings = this.elementsHandler.attackerSettingsHandler.getAttackerSettings();
           this.analysisInput.sensitiveAttributes = this.elementsHandler.sensitiveAttributesHandler.getSensitiveAttributes();
           $('.analysis-spinner').fadeIn();
