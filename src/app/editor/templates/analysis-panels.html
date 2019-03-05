@@ -21,7 +21,17 @@
       <div class="col-md-12">
         <button id="attacker-settings-button" type="button" class="btn btn-default pull-left" style="margin-top:10px">Attacker settings</button>
         <button id="sensitive-attributes-button" type="button" class="btn btn-default pull-left" style="margin-top:10px">Sensitive attributes</button>
-        <button id="run-analysis" type="button" class="btn btn-success" style="margin-top:10px">Run analysis</button>
+      </div>
+    </div>
+    <div class="row" style="margin-top:10px; margin-bottom:10px">
+      <div class="col-md-10 text-left">
+        <label for="attacker-allowed-queries" class="text-16" style="margin-top:5px; margin-right:5px; font-weight:400">Allowed number of queries:</span></label>
+        <input type="number" class="allowed-queries" id="attacker-allowed-queries-no" value="1" min="1" step="1" style="width:50px">
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-12 text-right">
+        <button id="run-analysis" type="button" class="btn btn-success">Run analysis</button>
       </div>
     </div>
   </div>

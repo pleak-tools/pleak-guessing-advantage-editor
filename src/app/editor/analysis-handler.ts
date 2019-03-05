@@ -31,7 +31,7 @@ export class AnalysisHandler {
   editor: any;
   elementsHandler: any;
 
-  analysisInput: any = {children: [], queries: "", epsilon: 0.3, schemas: "", attackerSettings: "", sensitiveAttributes: ""};
+  analysisInput: any = {children: [], queries: "", epsilon: 0.3, schemas: "", attackerSettings: "", sensitiveAttributes: "", numberOfQueries: 1};
   analysisResult: any = null;
   analysisInputTasksOrder: any = [];
 
@@ -40,13 +40,13 @@ export class AnalysisHandler {
 
   init() {
     // No changes in model, so show previous analysis results
-    if (!this.getChangesInModelStatus() && Number.parseFloat(this.analysisInput.epsilon) == Number.parseFloat($('.advantage-input').val()) && this.analysisInput.attackerSettings == this.elementsHandler.attackerSettingsHandler.getAttackerSettings() && this.analysisInput.sensitiveAttributes == this.elementsHandler.sensitiveAttributesHandler.getSensitiveAttributes()) {
+    if (!this.getChangesInModelStatus() && Number.parseFloat(this.analysisInput.epsilon) == Number.parseFloat($('.advantage-input').val()) && this.analysisInput.attackerSettings == this.elementsHandler.attackerSettingsHandler.getAttackerSettings() && this.analysisInput.sensitiveAttributes == this.elementsHandler.sensitiveAttributesHandler.getSensitiveAttributes() && Number.parseInt(this.analysisInput.numberOfQueries) == Number.parseInt($('.allowed-queries').val())) {
       this.showAnalysisResults();
       return;
     }
 
     // Changes in model, so run new analysis
-    this.analysisInput = {children: [], queries: "", epsilon: 0.3, schemas: "", attackerSettings: "", sensitiveAttributes: ""};
+    this.analysisInput = {children: [], queries: "", epsilon: 0.3, schemas: "", attackerSettings: "", sensitiveAttributes: "", numberOfQueries: 1};
     let counter = this.getAllModelTaskHandlers().length;
     this.analysisErrors = [];
     for (let taskId of this.getAllModelTaskHandlers().map(a => a.task.id)) {
@@ -140,6 +140,10 @@ export class AnalysisHandler {
         if (this.analysisErrors.length === 0) {
           this.analysisInput.queries.trim();
           this.analysisInput.epsilon = Number.parseFloat($('.advantage-input').val());
+          if (Number.parseInt($('.allowed-queries').val()) <= 0) {
+            $('.allowed-queries').val(1);
+          }
+          this.analysisInput.numberOfQueries = Number.parseInt($('.allowed-queries').val());
           this.analysisInput.attackerSettings = this.elementsHandler.attackerSettingsHandler.getAttackerSettings();
           this.analysisInput.sensitiveAttributes = this.elementsHandler.sensitiveAttributesHandler.getSensitiveAttributes();
           $('.analysis-spinner').fadeIn();
