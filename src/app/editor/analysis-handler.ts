@@ -1,6 +1,8 @@
 import * as Viewer from 'bpmn-js/lib/NavigatedViewer';
 
 import { ElementsHandler } from "./elements-handler";
+import { AuthService } from '../auth/auth.service';
+import { HttpResponse } from '@angular/common/http';
 
 declare let $: any;
 declare function require(name:string);
@@ -163,7 +165,7 @@ export class AnalysisHandler {
 
   // Call to the analyser
   runAnalysisREST(postData: any) {
-    this.editor.http.post(config.backend.host + '/rest/sql-privacy/analyze-guessing-advantage', postData, this.editor.authService.loadRequestOptions()).subscribe(
+    this.editor.http.post(config.backend.host + '/rest/sql-privacy/analyze-guessing-advantage', postData, AuthService.loadRequestOptions({observe: 'response'})).subscribe(
       success => {
         this.formatAnalysisResults(success);
       },
@@ -174,9 +176,9 @@ export class AnalysisHandler {
   }
 
   // Format analysis result string
-  formatAnalysisResults(success: any) {
+  formatAnalysisResults(success: HttpResponse<any>) {
     if (success.status === 200) {
-      let resultsString = success.json().result;
+      let resultsString = success.body.result;
       if (resultsString) {
         let lines = resultsString.split(String.fromCharCode(30));
         this.analysisResult = lines;
@@ -187,9 +189,9 @@ export class AnalysisHandler {
   }
 
   // Format analysis error string
-  formatAnalysisErrorResults(fail: any) {
+  formatAnalysisErrorResults(fail: HttpResponse<any>) {
     if (fail.status === 409) {
-      let resultsString = fail.json().error;
+      let resultsString = fail.body.error;
       let parts = resultsString.split("ERROR: ");
       if (parts.length > 1) {
         this.analysisResult = parts[1].replace("WARNING:  there is no transaction in progress", "");
