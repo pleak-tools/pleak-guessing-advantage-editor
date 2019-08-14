@@ -110,10 +110,18 @@ export class AnalysisHandler {
 
   // Format analyser input and send it to the analyser
   prepareTaskAnalyzerInput(taskId: string, counter: number, amount: number) {
-    let task = this.getTaskHandlerByTaskId(taskId);
-    let taskQuery = task.getPreparedQuery();
+    const task = this.getTaskHandlerByTaskId(taskId);
+    const taskQuery = task.getPreparedQuery();
+    let taskSchema = task.getPreparedSchema();
     if (taskQuery && taskQuery.success) {
-      let taskName = taskQuery.success.taskName;
+      let taskName = null;
+      let taskSchemaCmd = "";
+      if (taskSchema && taskSchema.success) {
+        taskName = taskSchema.success.tableName;
+        taskSchemaCmd = taskSchema.success.schema;
+      } else {
+        taskName = taskQuery.success.taskName;
+      }
       let query = taskQuery.success.query;
       let fullQuery = "";
       let inputIds = task.getTaskInputObjects().map(a => a.id);
@@ -136,6 +144,7 @@ export class AnalysisHandler {
       fullQuery = "INSERT INTO " + taskName + " " + query;
       this.analysisInput.queries += fullQuery + "\n\n";
       this.analysisInput.schemas += schemasQuery;
+      this.analysisInput.schemas += taskSchemaCmd;
       this.analysisInputTasksOrder.push({id: taskId, order: Math.abs(counter-amount)});
       this.canvas.removeMarker(taskId, 'highlight-general-error');
       if (counter === 1) {

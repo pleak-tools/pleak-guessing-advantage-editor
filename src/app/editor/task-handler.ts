@@ -8,6 +8,7 @@ declare let CodeMirror: any;
 declare function require(name:string);
 let config = require('../../config.json');
 
+let schemaCodeMirror;
 let codeMirror1;
 
 export class TaskHandler {
@@ -49,6 +50,15 @@ export class TaskHandler {
     return query;
   }
 
+  getTaskSchema() {
+    let query = "";
+    if (this.task.sqlTaskInfo != null) {
+      let savedData = JSON.parse(this.task.sqlTaskInfo);
+      query = savedData.schema;
+    }
+    return query;
+  }
+
   init() {
   }
 
@@ -57,7 +67,7 @@ export class TaskHandler {
   }
 
   areThereUnsavedTaskChanges() {
-    if (this.getTaskInputQuery() != codeMirror1.getValue()) {
+    if (this.getTaskInputQuery() != codeMirror1.getValue() || this.getTaskSchema() != schemaCodeMirror.getValue()) {
       return true;
     } else {
       return false;
@@ -78,7 +88,8 @@ export class TaskHandler {
 
   terminateTaskOptionsEditProcess() {
     this.beingEdited = false;
-    this.taskOptionsPanelContainer.find('#task-input1').val('');
+    this.taskOptionsPanelContainer.find('#task-schema').val('');
+    this.taskOptionsPanelContainer.find('#task-query').val('');
     this.removeTaskInputsOutputsHighlights();
     this.canvas.removeMarker(this.task.id, 'selected');
     this.terminateTaskOptionsButtons();
