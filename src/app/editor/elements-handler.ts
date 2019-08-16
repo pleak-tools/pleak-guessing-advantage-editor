@@ -5,6 +5,7 @@ import { TaskHandler } from "./task-handler";
 import { DataObjectHandler } from "./data-object-handler";
 import { AttackerSettingsHandler } from './attacker-settings-handler';
 import { SensitiveAttributesHandler } from './sensitive-attributes-handler';
+import { EditorComponent } from './editor.component';
 
 declare let $: any;
 let is = (element, type) => element.$instanceOf(type);
@@ -27,7 +28,7 @@ export class ElementsHandler {
   canvas: any;
   diagram: String;
   pg_parser: any;
-  parent: any;
+  parent: EditorComponent;
   canEdit: Boolean;
 
   analysisHandler: AnalysisHandler;
@@ -154,7 +155,7 @@ export class ElementsHandler {
   }
 
   updateModelContentVariable(xml: String) {
-    this.parent.newChanges = true;
+    // this.parent.newChanges = true;
     this.parent.updateModelContentVariable(xml);
     $('#analysis-results-panel-content').html('');
     $('#analysis-results-panel').hide();

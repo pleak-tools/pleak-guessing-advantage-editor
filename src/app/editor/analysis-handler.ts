@@ -1,8 +1,8 @@
 import * as Viewer from 'bpmn-js/lib/NavigatedViewer';
 
-import { ElementsHandler } from "./elements-handler";
 import { AuthService } from '../auth/auth.service';
 import { HttpResponse } from '@angular/common/http';
+import { EditorComponent } from './editor.component';
 
 declare let $: any;
 declare function require(name:string);
@@ -30,7 +30,7 @@ export class AnalysisHandler {
   overlays: any;
   diagram: String;
 
-  editor: any;
+  editor: EditorComponent;
   elementsHandler: any;
 
   analysisInput: any = {children: [], queries: "", epsilon: 0.3, schemas: "", attackerSettings: "", sensitiveAttributes: "", numberOfQueries: 1};
