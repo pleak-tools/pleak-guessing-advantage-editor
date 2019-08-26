@@ -266,7 +266,7 @@ export class TaskHandler {
   }
 
   updateTaskOptions() {
-    let infoObj = { input1: codeMirror1.getValue() };
+    let infoObj = { input1: codeMirror1.getValue(), schema: schemaCodeMirror.getValue() };
     this.task.sqlTaskInfo = JSON.stringify(infoObj);
   }
 
