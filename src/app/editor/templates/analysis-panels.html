@@ -17,6 +17,51 @@
         <input type="range" class="advantage-input" id="attacker-advantage-input" value="0.3" min="0.0" max="1.0" step="0.01">
       </div>
     </div>
+    <hr>
+    <div class="row">
+      <div class="col-md-6 text-right">
+        <div class="form-group" id="estimated-noise-input-form-group">
+          <label class="text-16" for="estimated-noise-input">Confidence level of estimated noise</label>
+        </div>
+      </div>      <div class="col-md-6 text-left">
+        <span id="estimated-noise-label">90</span>%
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-10 col-md-offset-1">
+        <input type="range" class="advantage-input" id="estimated-noise-input" value="0.9" min="0.0" max="1.0" step="0.01">
+      </div>
+    </div>
+    <hr>
+    <div class="row">
+      <div class="col-md-6 text-right">
+          <label class="text-16" for="sigmoid-smoothness-input">Sigmoid smoothness</label>
+      </div>
+      <div class="col-md-6 text-left">
+        <input type="number" name="" id="sigmoid-smoothness-input" value="0.01" step="0.01">
+      </div>
+    </div>
+    <hr>
+    <div class="row">
+      <div class="col-md-6 text-right">
+        <label class="text-16" for="sigmoid-precision-input">Sigmoid precision</label>
+      </div>
+      <div class="col-md-6 text-left">
+        <input type="number" name="" id="sigmoid-precision-input" value="5" step="0.1">
+      </div>
+    </div>
+
+    <hr>
+    <div class="row">
+      <div class="col-md-6 text-right">
+          <label class="text-16" for="datestyle-input">PSQL datestyle</label>
+      </div>
+      <div class="col-md-6 text-left">
+        <input type="text" id="datestyle-input" value="European">
+      </div>
+    </div>
+
+    <hr>
     <div class="row" style="text-align:right">
       <div class="col-md-12">
         <button id="attacker-settings-button" type="button" class="btn btn-default pull-left" style="margin-top:10px">Table Constraints</button>

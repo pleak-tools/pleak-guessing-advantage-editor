@@ -101,6 +101,10 @@ export class AnalysisHandler {
       let percent = Math.round($('#attacker-advantage-input').val() * 100);
       $('#analysis-panel').find('#attacker-advantage-label').text(percent);
     });
+    $(document).find('#estimated-noise-input').on('input', (e) => {
+      let percent = Math.round($('#estimated-noise-input').val() * 100);
+      $('#analysis-panel').find('#estimated-noise-label').text(percent);
+    });
     $('#analysis-panel').on('click', '#sensitive-attributes-button', (e) => {
       e.preventDefault();
       e.stopPropagation();
@@ -158,10 +162,10 @@ export class AnalysisHandler {
           this.analysisInput.attackerSettings = this.elementsHandler.attackerSettingsHandler.getAttackerSettings();
           this.analysisInput.sensitiveAttributes = this.elementsHandler.sensitiveAttributesHandler.getSensitiveAttributes();
 
-          this.analysisInput.errorUB = 0.9; // TODO: read from input
-          this.analysisInput.sigmoidBeta = 0.01; // TODO: read from input
-          this.analysisInput.sigmoidPrecision = 5.0; // TODO: read from input
-          this.analysisInput.dateStyle = "European"; // TODO: read from input
+          this.analysisInput.errorUB = Number.parseFloat($('#estimated-noise-input').val());
+          this.analysisInput.sigmoidBeta = Number.parseFloat($('#sigmoid-smoothness-input').val());
+          this.analysisInput.sigmoidPrecision = Number.parseFloat($('#sigmoid-precision-input').val());
+          this.analysisInput.dateStyle = $('#datestyle-input').val();
 
           $('.analysis-spinner').fadeIn();
           $('#analysis-results-panel-content').html('');
