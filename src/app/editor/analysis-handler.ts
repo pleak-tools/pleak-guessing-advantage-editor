@@ -110,6 +110,20 @@ export class AnalysisHandler {
       e.stopPropagation();
       this.elementsHandler.sensitiveAttributesHandler.initSensitiveAttributesEditProcess();
     });
+
+    $('#analysis-panel').on('click', '#disable-advanced-settings', (event) => {
+      $('#advanced-settings').find('input').attr('disabled', true);
+      $('#advanced-settings').css('opacity', '0.4');
+      $(event.target).hide();
+      $('#enable-advanced-settings').show();
+    });
+
+    $('#analysis-panel').on('click', '#enable-advanced-settings', (event) => {
+      $('#advanced-settings').find('input').attr('disabled', false);
+      $('#advanced-settings').css('opacity', '1');
+      $(event.target).hide();
+      $('#disable-advanced-settings').show();
+    });
   }
 
   // Format analyser input and send it to the analyser
@@ -163,9 +177,9 @@ export class AnalysisHandler {
           this.analysisInput.sensitiveAttributes = this.elementsHandler.sensitiveAttributesHandler.getSensitiveAttributes();
 
           this.analysisInput.errorUB = Number.parseFloat($('#estimated-noise-input').val());
-          this.analysisInput.sigmoidBeta = Number.parseFloat($('#sigmoid-smoothness-input').val());
-          this.analysisInput.sigmoidPrecision = Number.parseFloat($('#sigmoid-precision-input').val());
-          this.analysisInput.dateStyle = $('#datestyle-input').val();
+          this.analysisInput.sigmoidBeta = $('#sigmoid-smoothness-input').attr('disabled') ? -1 : Number.parseFloat($('#sigmoid-smoothness-input').val());
+          this.analysisInput.sigmoidPrecision = $('#sigmoid-precision-input').attr('disabled') ? -1 : Number.parseFloat($('#sigmoid-precision-input').val());
+          this.analysisInput.dateStyle = $('#datestyle-input').attr('disabled') ? -1 :  $('#datestyle-input').val();
 
           $('.analysis-spinner').fadeIn();
           $('#analysis-results-panel-content').html('');
