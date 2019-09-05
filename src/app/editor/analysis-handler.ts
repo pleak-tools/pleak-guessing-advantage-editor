@@ -5,7 +5,7 @@ import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
 import { EditorComponent } from './editor.component';
 
 declare let $: any;
-declare function require(name:string);
+declare function require(name: string);
 let is = (element, type) => element.$instanceOf(type);
 
 let config = require('../../config.json');
@@ -33,7 +33,7 @@ export class AnalysisHandler {
   editor: EditorComponent;
   elementsHandler: any;
 
-  analysisInput: any = {children: [], queries: "", epsilon: 0.3, schemas: "", attackerSettings: "", sensitiveAttributes: "", numberOfQueries: 1, errorUB: 0.9, sigmoidBeta: 0.01, sigmoidPrecision: 5.0, dateStyle: "European"};
+  analysisInput: any = { children: [], queries: "", epsilon: 0.3, schemas: "", attackerSettings: "", sensitiveAttributes: "", numberOfQueries: 1, errorUB: 0.9, sigmoidBeta: 0.01, sigmoidPrecision: 5.0, dateStyle: "European" };
   analysisResult: any = null;
   analysisInputTasksOrder: any = [];
 
@@ -42,13 +42,22 @@ export class AnalysisHandler {
 
   init() {
     // No changes in model, so show previous analysis results
-    if (!this.getChangesInModelStatus() && Number.parseFloat(this.analysisInput.epsilon) == Number.parseFloat($('.advantage-input').val()) && this.analysisInput.attackerSettings == this.elementsHandler.attackerSettingsHandler.getAttackerSettings() && this.analysisInput.sensitiveAttributes == this.elementsHandler.sensitiveAttributesHandler.getSensitiveAttributes() && Number.parseInt(this.analysisInput.numberOfQueries) == Number.parseInt($('.allowed-queries').val())) {
+    if (!this.getChangesInModelStatus() &&
+      Number.parseFloat(this.analysisInput.epsilon) == Number.parseFloat($('.advantage-input').val()) &&
+      this.analysisInput.attackerSettings == this.elementsHandler.attackerSettingsHandler.getAttackerSettings() &&
+      this.analysisInput.sensitiveAttributes == this.elementsHandler.sensitiveAttributesHandler.getSensitiveAttributes() &&
+      Number.parseInt(this.analysisInput.numberOfQueries) == Number.parseInt($('.allowed-queries').val()) &&
+      Number.parseFloat(this.analysisInput.errorUB) == Number.parseFloat($('#estimated-noise-input').val()) &&
+      Number.parseFloat(this.analysisInput.sigmoidBeta) == Number.parseFloat($('#sigmoid-smoothness-input').val()) &&
+      Number.parseFloat(this.analysisInput.sigmoidPrecision) == Number.parseFloat($('#sigmoid-precision-input').val()) &&
+      this.analysisInput.dateStyle == $('#datestyle-input').val()
+    ) {
       this.showAnalysisResults();
       return;
     }
 
     // Changes in model, so run new analysis
-    this.analysisInput = {children: [], queries: "", epsilon: 0.3, schemas: "", attackerSettings: "", sensitiveAttributes: "", numberOfQueries: 1, errorUB: 0.9, sigmoidBeta: 0.01, sigmoidPrecision: 5.0, dateStyle: "European"};
+    this.analysisInput = { children: [], queries: "", epsilon: 0.3, schemas: "", attackerSettings: "", sensitiveAttributes: "", numberOfQueries: 1, errorUB: 0.9, sigmoidBeta: 0.01, sigmoidPrecision: 5.0, dateStyle: "European" };
     let counter = this.getAllModelTaskHandlers().length;
     this.analysisErrors = [];
     for (let taskId of this.getAllModelTaskHandlers().map(a => a.task.id)) {
@@ -116,6 +125,7 @@ export class AnalysisHandler {
       $('#advanced-settings').css('opacity', '0.4');
       $(event.target).hide();
       $('#enable-advanced-settings').show();
+      this.setChangesInModelStatus(true);
     });
 
     $('#analysis-panel').on('click', '#enable-advanced-settings', (event) => {
@@ -123,6 +133,7 @@ export class AnalysisHandler {
       $('#advanced-settings').css('opacity', '1');
       $(event.target).hide();
       $('#disable-advanced-settings').show();
+      this.setChangesInModelStatus(true);
     });
   }
 
@@ -147,14 +158,14 @@ export class AnalysisHandler {
       for (let inputId of inputIds) {
         let dataObjectQueries = this.getPreparedQueriesOfDataObjectByDataObjectId(inputId);
         if (dataObjectQueries) {
-          let alreadyAddedDataObject = this.analysisInput.children.filter(function( obj ) {
+          let alreadyAddedDataObject = this.analysisInput.children.filter(function (obj) {
             return obj.id == inputId;
           });
           if (alreadyAddedDataObject.length === 0) {
             this.analysisInput.children.push(dataObjectQueries);
             if (dataObjectQueries.schema) {
               let schema = dataObjectQueries.schema + "\n";
-             schemasQuery += schema;
+              schemasQuery += schema;
             }
           }
         }
@@ -163,7 +174,7 @@ export class AnalysisHandler {
       this.analysisInput.queries += fullQuery + "\n\n";
       this.analysisInput.schemas += schemasQuery;
       this.analysisInput.schemas += taskSchemaCmd;
-      this.analysisInputTasksOrder.push({id: taskId, order: Math.abs(counter-amount)});
+      this.analysisInputTasksOrder.push({ id: taskId, order: Math.abs(counter - amount) });
       this.canvas.removeMarker(taskId, 'highlight-general-error');
       if (counter === 1) {
         if (this.analysisErrors.length === 0) {
@@ -179,7 +190,7 @@ export class AnalysisHandler {
           this.analysisInput.errorUB = Number.parseFloat($('#estimated-noise-input').val());
           this.analysisInput.sigmoidBeta = $('#sigmoid-smoothness-input').attr('disabled') ? -1 : Number.parseFloat($('#sigmoid-smoothness-input').val());
           this.analysisInput.sigmoidPrecision = $('#sigmoid-precision-input').attr('disabled') ? -1 : Number.parseFloat($('#sigmoid-precision-input').val());
-          this.analysisInput.dateStyle = $('#datestyle-input').attr('disabled') ? -1 :  $('#datestyle-input').val();
+          this.analysisInput.dateStyle = $('#datestyle-input').attr('disabled') ? -1 : $('#datestyle-input').val();
 
           $('.analysis-spinner').fadeIn();
           $('#analysis-results-panel-content').html('');
@@ -198,7 +209,7 @@ export class AnalysisHandler {
 
   // Call to the analyser
   runAnalysisREST(postData: any) {
-    this.editor.http.post(config.backend.host + '/rest/sql-privacy/analyze-guessing-advantage', postData, AuthService.loadRequestOptions({observe: 'response'})).subscribe(
+    this.editor.http.post(config.backend.host + '/rest/sql-privacy/analyze-guessing-advantage', postData, AuthService.loadRequestOptions({ observe: 'response' })).subscribe(
       success => {
         this.formatAnalysisResults(success);
       },
@@ -241,17 +252,17 @@ export class AnalysisHandler {
 
       let priorGuessProbability: any = Number.parseFloat(this.analysisResult[0]).toFixed(2);
       priorGuessProbability = (priorGuessProbability == 0 ? 0 : priorGuessProbability);
-      priorGuessProbability = ( isNaN(priorGuessProbability) ? "&infin;" : priorGuessProbability + " %" );
+      priorGuessProbability = (isNaN(priorGuessProbability) ? "&infin;" : priorGuessProbability + " %");
 
       let posteriorGuessProbability: any = Number.parseFloat(this.analysisResult[1]).toFixed(2);
       posteriorGuessProbability = (posteriorGuessProbability == 0 ? 0 : posteriorGuessProbability);
-      posteriorGuessProbability = ( isNaN(posteriorGuessProbability) ? "&infin;" : posteriorGuessProbability + " %" );
+      posteriorGuessProbability = (isNaN(posteriorGuessProbability) ? "&infin;" : posteriorGuessProbability + " %");
 
       let expectedCost: any = Number.parseFloat(this.analysisResult[2]).toFixed(2);
 
       let relativeError: any = Number.parseFloat(this.analysisResult[3]).toFixed(2);
       relativeError = (relativeError == 0 ? 0 : relativeError);
-      relativeError = ( isNaN(relativeError) ? "&infin;" : relativeError + " %" );
+      relativeError = (isNaN(relativeError) ? "&infin;" : relativeError + " %");
 
       resultsHtml += `
       <div class="" id="general-analysis-results">
@@ -298,7 +309,7 @@ export class AnalysisHandler {
       let i = 0;
       for (let error of this.analysisErrors) {
         let errorMsg = error.error.charAt(0).toUpperCase() + error.error.slice(1);
-        errors_list += '<li class="error-list-element error-'+i+'" style="font-size:16px; color:darkred; cursor:pointer;">'+errorMsg+'</li>';
+        errors_list += '<li class="error-list-element error-' + i + '" style="font-size:16px; color:darkred; cursor:pointer;">' + errorMsg + '</li>';
         $('#analysis-results-panel-content').on('click', '.error-' + i, (e) => {
           this.highlightObjectWithErrorByIds(error.object);
           $(e.target).css("font-weight", "bold");
@@ -321,17 +332,17 @@ export class AnalysisHandler {
   // Add unique error to errors list
   addUniqueErrorToErrorsList(error: String, ids: String[]) {
     let errors = this.analysisErrors;
-    let sameErrorMsgs = errors.filter(function( obj ) {
+    let sameErrorMsgs = errors.filter(function (obj) {
       return obj.error == error && obj.object.toString() === ids.toString();
     });
     if (sameErrorMsgs.length === 0) {
-      errors.push({error: error, object: ids});
+      errors.push({ error: error, object: ids });
     }
   }
 
   // Remove click handlers of error links in errors list
   removeErrorsListClickHandlers() {
-    for (let j=0; j < this.numberOfErrorsInModel; j++) {
+    for (let j = 0; j < this.numberOfErrorsInModel; j++) {
       $('#analysis-results-panel-content').off('click', '.error-' + j);
     }
   }
