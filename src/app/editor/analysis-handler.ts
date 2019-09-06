@@ -324,29 +324,28 @@ export class AnalysisHandler {
                 </tr>
                  <tr>
                   <td style="text-align: left;"><strong>delta (Laplace only)</strong></td>
-                  <td>` + this.analysisResult[7] + `</td>
-                </tr>
-                 <tr>
-                  <td style="text-align: left;"><strong>norm N</strong></td>
                   <td>` + this.analysisResult[8] + `</td>
                 </tr>
                  <tr>
-                  <td style="text-align: left;"><strong>beta-smooth sensitivity</strong></td>
+                  <td style="text-align: left;"><strong>norm N</strong></td>
                   <td>` + this.analysisResult[9] + `</td>
                 </tr>
                  <tr>
-                  <td style="text-align: left;"><strong>` + Math.round(this.analysisInput.errorUB * 100) + `%-noise magnitude (Laplace)</strong></td>
+                  <td style="text-align: left;"><strong>beta-smooth sensitivity</strong></td>
                   <td>` + this.analysisResult[10] + `</td>
                 </tr>
                  <tr>
-                  <td style="text-align: left;"><strong>` + Math.round(this.analysisInput.errorUB * 100) + `%-realtive error (Laplace)</strong></td>
+                  <td style="text-align: left;"><strong>` + Math.round(this.analysisInput.errorUB * 100) + `%-noise magnitude (Laplace)</strong></td>
                   <td>` + this.analysisResult[11] + `</td>
                 </tr>
                  <tr>
-                  <td style="text-align: left;"><strong>Laplace noise distribution</strong></td>
+                  <td style="text-align: left;"><strong>` + Math.round(this.analysisInput.errorUB * 100) + `%-realtive error (Laplace)</strong></td>
                   <td>` + this.analysisResult[12] + `</td>
                 </tr>
-                
+                 <tr>
+                  <td style="text-align: left;"><strong>Laplace noise distribution</strong></td>
+                  <td>` + this.analysisResult[13] + `</td>
+                </tr>
               </tbody>
             </table>
           </div>
