@@ -5,7 +5,9 @@ import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
 import { EditorComponent } from './editor.component';
 
 declare let $: any;
+
 declare function require(name: string);
+
 let is = (element, type) => element.$instanceOf(type);
 
 let config = require('../../config.json');
@@ -33,7 +35,19 @@ export class AnalysisHandler {
   editor: EditorComponent;
   elementsHandler: any;
 
-  analysisInput: any = { children: [], queries: "", epsilon: 0.3, schemas: "", attackerSettings: "", sensitiveAttributes: "", numberOfQueries: 1, errorUB: 0.9, sigmoidBeta: 0.01, sigmoidPrecision: 5.0, dateStyle: "European" };
+  analysisInput: any = {
+    children: [],
+    queries: '',
+    epsilon: 0.3,
+    schemas: '',
+    attackerSettings: '',
+    sensitiveAttributes: '',
+    numberOfQueries: 1,
+    errorUB: 0.9,
+    sigmoidBeta: 0.01,
+    sigmoidPrecision: 5.0,
+    dateStyle: 'European'
+  };
   analysisResult: any = null;
   analysisInputTasksOrder: any = [];
 
@@ -57,7 +71,19 @@ export class AnalysisHandler {
     }
 
     // Changes in model, so run new analysis
-    this.analysisInput = { children: [], queries: "", epsilon: 0.3, schemas: "", attackerSettings: "", sensitiveAttributes: "", numberOfQueries: 1, errorUB: 0.9, sigmoidBeta: 0.01, sigmoidPrecision: 5.0, dateStyle: "European" };
+    this.analysisInput = {
+      children: [],
+      queries: '',
+      epsilon: 0.3,
+      schemas: '',
+      attackerSettings: '',
+      sensitiveAttributes: '',
+      numberOfQueries: 1,
+      errorUB: 0.9,
+      sigmoidBeta: 0.01,
+      sigmoidPrecision: 5.0,
+      dateStyle: 'European'
+    };
     let counter = this.getAllModelTaskHandlers().length;
     this.analysisErrors = [];
     for (let taskId of this.getAllModelTaskHandlers().map(a => a.task.id)) {
@@ -144,7 +170,7 @@ export class AnalysisHandler {
     let taskSchema = task.getPreparedSchema();
     if (taskQuery && taskQuery.success) {
       let taskName = null;
-      let taskSchemaCmd = "";
+      let taskSchemaCmd = '';
       if (taskSchema && taskSchema.success) {
         taskName = taskSchema.success.tableName;
         taskSchemaCmd = taskSchema.success.schema;
@@ -152,9 +178,9 @@ export class AnalysisHandler {
         taskName = taskQuery.success.taskName;
       }
       let query = taskQuery.success.query;
-      let fullQuery = "";
+      let fullQuery = '';
       let inputIds = task.getTaskInputObjects().map(a => a.id);
-      let schemasQuery = "";
+      let schemasQuery = '';
       for (let inputId of inputIds) {
         let dataObjectQueries = this.getPreparedQueriesOfDataObjectByDataObjectId(inputId);
         if (dataObjectQueries) {
@@ -164,14 +190,14 @@ export class AnalysisHandler {
           if (alreadyAddedDataObject.length === 0) {
             this.analysisInput.children.push(dataObjectQueries);
             if (dataObjectQueries.schema) {
-              let schema = dataObjectQueries.schema + "\n";
+              let schema = dataObjectQueries.schema + '\n';
               schemasQuery += schema;
             }
           }
         }
       }
-      fullQuery = "INSERT INTO " + taskName + " " + query;
-      this.analysisInput.queries += fullQuery + "\n\n";
+      fullQuery = 'INSERT INTO ' + taskName + ' ' + query;
+      this.analysisInput.queries += fullQuery + '\n\n';
       this.analysisInput.schemas += schemasQuery;
       this.analysisInput.schemas += taskSchemaCmd;
       this.analysisInputTasksOrder.push({ id: taskId, order: Math.abs(counter - amount) });
@@ -183,7 +209,7 @@ export class AnalysisHandler {
           if (Number.parseInt($('.allowed-queries').val()) <= 0) {
             $('.allowed-queries').val(1);
           }
-          this.analysisInput.numberOfQueries = Number.parseInt($('.allowed-queries').val());
+          this.analysisInput.numberOfQueries =  $('.allowed-queries').attr('disabled') ? 1 : Number.parseInt($('.allowed-queries').val());
           this.analysisInput.attackerSettings = this.elementsHandler.attackerSettingsHandler.getAttackerSettings();
           this.analysisInput.sensitiveAttributes = this.elementsHandler.sensitiveAttributesHandler.getSensitiveAttributes();
 
@@ -236,11 +262,11 @@ export class AnalysisHandler {
   formatAnalysisErrorResults(fail: HttpErrorResponse) {
     if (fail.status === 409) {
       this.analysisResult = fail.error.error;
-      this.analysisResult = this.analysisResult.replace("WARNING:  there is no transaction in progress", "");
+      this.analysisResult = this.analysisResult.replace('WARNING:  there is no transaction in progress', '');
     } else if (fail.status === 400) {
-      this.analysisResult = "Analyzer error";
+      this.analysisResult = 'Analyzer error';
     } else {
-      this.analysisResult = "Server error";
+      this.analysisResult = 'Server error';
     }
     this.showAnalysisErrorResult();
   }
@@ -249,20 +275,6 @@ export class AnalysisHandler {
   showAnalysisResults() {
     if (this.analysisResult) {
       let resultsHtml = '';
-
-      let priorGuessProbability: any = Number.parseFloat(this.analysisResult[0]).toFixed(2);
-      priorGuessProbability = (priorGuessProbability == 0 ? 0 : priorGuessProbability);
-      priorGuessProbability = (isNaN(priorGuessProbability) ? "&infin;" : priorGuessProbability + " %");
-
-      let posteriorGuessProbability: any = Number.parseFloat(this.analysisResult[1]).toFixed(2);
-      posteriorGuessProbability = (posteriorGuessProbability == 0 ? 0 : posteriorGuessProbability);
-      posteriorGuessProbability = (isNaN(posteriorGuessProbability) ? "&infin;" : posteriorGuessProbability + " %");
-
-      let expectedCost: any = Number.parseFloat(this.analysisResult[2]).toFixed(2);
-
-      let relativeError: any = Number.parseFloat(this.analysisResult[3]).toFixed(2);
-      relativeError = (relativeError == 0 ? 0 : relativeError);
-      relativeError = (isNaN(relativeError) ? "&infin;" : relativeError + " %");
 
       resultsHtml += `
       <div class="" id="general-analysis-results">
@@ -273,15 +285,68 @@ export class AnalysisHandler {
           <div class="panel-body">
             <table style="width:100%;text-align:right">
               <tbody>
-                <tr><td style="width:70%;text-align:left"><b>80% relative error <br/>(additive noise / query output)</b></td><td>` + relativeError + `</td><tr>
-                <tr><td style="width:70%;text-align:left"><b>Expected cost</b></td><td>` + expectedCost + `</td><tr>
+                <tr>
+                  <td style="text-align: left;"><strong>actual outputs y</strong></td>
+                  <td>` + this.analysisResult[0] + `</td>
+                </tr>
+                <tr>
+                  <td style="text-align: left;"><strong>` + Math.round(this.analysisInput.errorUB * 100) + `%-noise magnitude a</strong></td>
+                  <td>` + this.analysisResult[1] + `</td>
+                </tr>
+                <tr>
+                  <td style="text-align: left;"><strong>` + Math.round(this.analysisInput.errorUB * 100) + `%-realtive error |a|/|y|</strong></td>
+                  <td>` + this.analysisResult[2] + `</td>
+                </tr>
               </tbody>
             </table>
             <div class="view-more-results-div" style="display:block;text-align:right;margin-top:10px;margin-bottom:10px"><span class="more-results-link">View more</span></div>
             <table style="width:100%;text-align:right;display:none" class="more-analysis-results">
               <tbody>
-                <tr><td style="width:70%;text-align:left"><b>Guess probability (prior)</b></td><td>` + priorGuessProbability + `</td><tr>
-                <tr><td style="width:70%;text-align:left"><b>Guess probability (posterior)</b></td><td>` + posteriorGuessProbability + `</td><tr>
+                <tr>
+                  <td style="text-align: left;"><strong>Cauchy (default) distribution</strong></td>
+                  <td>` + this.analysisResult[3] + `</td>
+                </tr>
+                <tr>
+                  <td style="text-align: left;"><strong>prior (worst instance)</strong></td>
+                  <td>` + this.analysisResult[4] + `</td>
+                </tr>
+                <tr>
+                  <td style="text-align: left;"><strong>posterior (worst instance)</strong></td>
+                  <td>` + this.analysisResult[5] + `</td>
+                </tr>
+                <tr>
+                  <td style="text-align: left;"><strong>DP epsilon</strong></td>
+                  <td>` + this.analysisResult[6] + `</td>
+                </tr>
+                <tr>
+                  <td style="text-align: left;"><strong>smoothness beta</strong></td>
+                  <td>` + this.analysisResult[7] + `</td>
+                </tr>
+                 <tr>
+                  <td style="text-align: left;"><strong>delta (Laplace only)</strong></td>
+                  <td>` + this.analysisResult[7] + `</td>
+                </tr>
+                 <tr>
+                  <td style="text-align: left;"><strong>norm N</strong></td>
+                  <td>` + this.analysisResult[8] + `</td>
+                </tr>
+                 <tr>
+                  <td style="text-align: left;"><strong>beta-smooth sensitivity</strong></td>
+                  <td>` + this.analysisResult[9] + `</td>
+                </tr>
+                 <tr>
+                  <td style="text-align: left;"><strong>` + Math.round(this.analysisInput.errorUB * 100) + `%-noise magnitude (Laplace)</strong></td>
+                  <td>` + this.analysisResult[10] + `</td>
+                </tr>
+                 <tr>
+                  <td style="text-align: left;"><strong>` + Math.round(this.analysisInput.errorUB * 100) + `%-realtive error (Laplace)</strong></td>
+                  <td>` + this.analysisResult[11] + `</td>
+                </tr>
+                 <tr>
+                  <td style="text-align: left;"><strong>Laplace noise distribution</strong></td>
+                  <td>` + this.analysisResult[12] + `</td>
+                </tr>
+                
               </tbody>
             </table>
           </div>
@@ -312,7 +377,7 @@ export class AnalysisHandler {
         errors_list += '<li class="error-list-element error-' + i + '" style="font-size:16px; color:darkred; cursor:pointer;">' + errorMsg + '</li>';
         $('#analysis-results-panel-content').on('click', '.error-' + i, (e) => {
           this.highlightObjectWithErrorByIds(error.object);
-          $(e.target).css("font-weight", "bold");
+          $(e.target).css('font-weight', 'bold');
         });
         i++;
       }
@@ -357,7 +422,7 @@ export class AnalysisHandler {
 
   // Remove error highlights
   removeErrorHiglights() {
-    $('.error-list-element').css("font-weight", "");
+    $('.error-list-element').css('font-weight', '');
     for (let taskHandler of this.getAllModelTaskHandlers()) {
       this.canvas.removeMarker(taskHandler.task.id, 'highlight-general-error');
     }
