@@ -323,7 +323,7 @@ export class AnalysisHandler {
                   <td>` + this.analysisResult[7] + `</td>
                 </tr>
                  <tr>
-                  <td style="text-align: left;"><strong>delta (Laplace only)</strong></td>
+                  <td style="text-align: left;"><strong>(epsilon,delta) for Laplace noise</strong></td>
                   <td>` + this.analysisResult[8] + `</td>
                 </tr>
                  <tr>
