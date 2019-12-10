@@ -34,10 +34,13 @@ export class AttackerSettingsHandler {
   attackerSettingsPanelContainer: any;
 
   getSavedAttackerSettings() {
-    let root = this.registry.get('Process_1');
-    let attackerPriorKnowledge = "";
+    let rootElement = this.canvas.getRootElement();
+    let root = null;
+    if (rootElement && rootElement.businessObject) {
+      root = this.registry.get(rootElement.businessObject.id);
+    }
     if (root && root.businessObject && root.businessObject.policyInfo != null) {
-      return attackerPriorKnowledge = JSON.parse(root.businessObject.policyInfo).attackerKnowledge;
+      return JSON.parse(root.businessObject.policyInfo).attackerKnowledge;
     } else {
       return null;
     }
@@ -123,7 +126,11 @@ export class AttackerSettingsHandler {
   updateAttackerSettings() {
     let attackerKnowledge = attackerKnowledgeCodeMirror.getValue();
     let sensitiveAttributes = "";
-    let root = this.registry.get('Process_1');
+    let rootElement = this.canvas.getRootElement();
+    let root = null;
+    if (rootElement && rootElement.businessObject) {
+      root = this.registry.get(rootElement.businessObject.id);
+    }
     if (root && root.businessObject) {
       if (root.businessObject.policyInfo != null) {
         sensitiveAttributes = JSON.parse(root.businessObject.policyInfo).sensitiveAttributes;

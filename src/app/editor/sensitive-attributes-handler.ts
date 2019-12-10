@@ -34,10 +34,13 @@ export class SensitiveAttributesHandler {
   sensitiveAttributesPanelContainer: any;
 
   getSavedSensitiveAttributes() {
-    let root = this.registry.get('Process_1');
-    let sensitiveAttributes = "";
+    let rootElement = this.canvas.getRootElement();
+    let root = null;
+    if (rootElement && rootElement.businessObject) {
+      root = this.registry.get(rootElement.businessObject.id);
+    }
     if (root && root.businessObject && root.businessObject.policyInfo != null) {
-      return sensitiveAttributes = JSON.parse(root.businessObject.policyInfo).sensitiveAttributes;
+      return JSON.parse(root.businessObject.policyInfo).sensitiveAttributes;
     } else {
       return null;
     }
@@ -123,7 +126,11 @@ export class SensitiveAttributesHandler {
   updateSensitiveAttributes() {
     let sensitiveAttributes = sensitiveAttributesCodeMirror.getValue();
     let attackerKnowledge = "";
-    let root = this.registry.get('Process_1');
+    let rootElement = this.canvas.getRootElement();
+    let root = null;
+    if (rootElement && rootElement.businessObject) {
+      root = this.registry.get(rootElement.businessObject.id);
+    }
     if (root && root.businessObject) {
       if (root.businessObject.policyInfo != null) {
         attackerKnowledge = JSON.parse(root.businessObject.policyInfo).attackerKnowledge;
