@@ -3,7 +3,6 @@ import * as Viewer from 'bpmn-js/lib/NavigatedViewer';
 import { AnalysisHandler } from './analysis-handler';
 import { TaskHandler } from "./task-handler";
 import { DataObjectHandler } from "./data-object-handler";
-import { AttackerSettingsHandler } from './attacker-settings-handler';
 import { SensitiveAttributesHandler } from './sensitive-attributes-handler';
 import { EditorComponent } from './editor.component';
 
@@ -16,6 +15,7 @@ export class ElementsHandler {
     this.viewer = viewer;
     this.eventBus = this.viewer.get('eventBus');
     this.canvas = this.viewer.get('canvas');
+    this.overlays = this.viewer.get('overlays');
     this.diagram = diagram;
     this.pg_parser = pg_parser;
     this.parent = parent;
@@ -26,6 +26,7 @@ export class ElementsHandler {
   viewer: Viewer;
   eventBus: any;
   canvas: any;
+  overlays: any;
   diagram: String;
   pg_parser: any;
   parent: EditorComponent;
@@ -33,11 +34,13 @@ export class ElementsHandler {
 
   analysisHandler: AnalysisHandler;
 
-  attackerSettingsHandler: AttackerSettingsHandler;
   sensitiveAttributesHandler: SensitiveAttributesHandler;
 
   taskHandlers: TaskHandler[] = [];
   dataObjectHandlers: DataObjectHandler[] = [];
+
+  selectedTasks: any[] = [];
+  selectedTaskSettings: any = null;
 
   init() {
     // Import model from xml file
@@ -47,12 +50,16 @@ export class ElementsHandler {
         if (typeof definitions !== 'undefined') {
           // Add stereotype labels to elements based on xml labels
           this.viewer.importDefinitions(definitions, () => this.createElementHandlerInstances(definitions));
+          this.parent.initExportButton();
         }
       });
       // Add click event listener to init and terminate stereotype processes
       this.eventBus.on('element.click', (e) => {
 
-        if (is(e.element.businessObject, 'bpmn:Task') || (is(e.element.businessObject, 'bpmn:DataObjectReference') && e.element.incoming.length === 0)) {
+        // Selecting dataObjects and dataStores for SQL leaks-when analysis
+        this.initTaskSelectMenu(e.element);
+
+        if (is(e.element.businessObject, 'bpmn:Task') || is(e.element.businessObject, 'bpmn:DataObjectReference') || is(e.element.businessObject, 'bpmn:DataStoreReference')) {
           this.canvas.removeMarker(e.element.id, 'selected');
           let beingEditedElementHandler = this.taskHandlers.filter(function (obj) {
             return obj.task != e.element.businessObject && obj.beingEdited;
@@ -78,7 +85,7 @@ export class ElementsHandler {
             if (toBeEditedelementHandler.length > 0) {
               toBeEditedelementHandler[0].initTaskOptionsEditProcess();
             }
-          } else if (is(e.element.businessObject, 'bpmn:DataObjectReference') && e.element.incoming.length === 0) {
+          } else if (is(e.element.businessObject, 'bpmn:DataObjectReference') || is(e.element.businessObject, 'bpmn:DataStoreReference')) {
             toBeEditedelementHandler = this.dataObjectHandlers.filter(function (obj) {
               return obj.dataObject == e.element.businessObject && obj.beingEdited == false;
             });
@@ -91,9 +98,66 @@ export class ElementsHandler {
       });
     });
     this.analysisHandler = new AnalysisHandler(this.viewer, this.diagram, this);
-    this.attackerSettingsHandler = new AttackerSettingsHandler(this.viewer, this.diagram, this);
     this.sensitiveAttributesHandler = new SensitiveAttributesHandler(this.viewer, this.diagram, this);
     this.prepareParser();
+  }
+
+
+  initTaskSelectMenu(element: any): void {
+    this.terminateTaskSelectMenu();
+    if (element.type === "bpmn:Task") {
+      this.reloadTaskSelectMenu(element);
+    }
+  }
+
+  reloadTaskSelectMenu(element: any): void {
+    this.terminateTaskSelectMenu();
+    const taskId = element.businessObject.id;
+
+    let overlayHtml = `<div class="task-selector-editor" id="` + taskId + `-task-selector" style="background:white; padding:10px; border-radius:2px">`;
+
+    if (element.type === "bpmn:Task") {
+      const index = this.selectedTasks.findIndex(x => x === element.businessObject);
+      if (index === -1) {
+        overlayHtml += `<button class="btn btn-default" id="` + taskId + `-task-on-button">Select</button><br>`;
+      } else {
+        overlayHtml += `<button class="btn btn-default" id="` + taskId + `-task-off-button">Deselect</button><br>`;
+      }
+    }
+    overlayHtml += `</div>`;
+    overlayHtml = $(overlayHtml);
+
+    this.selectedTaskSettings = this.overlays.add(element, {
+      position: {
+        top: -15,
+        right: -30
+      },
+      html: overlayHtml
+    });
+
+    if (element.type === "bpmn:Task") {
+      const index = this.selectedTasks.findIndex(x => x === element.businessObject);
+      if (index === -1) {
+        $(overlayHtml).on('click', '#' + taskId + '-task-on-button', () => {
+          this.selectedTasks.push(element.businessObject);
+          this.canvas.addMarker(element.id, 'highlight-task-selected');
+          this.reloadTaskSelectMenu(element);
+        });
+      } else {
+        $(overlayHtml).on('click', '#' + taskId + '-task-off-button', () => {
+          this.selectedTasks.splice(index, 1);
+          this.canvas.removeMarker(element.id, 'highlight-task-selected');
+          this.reloadTaskSelectMenu(element);
+        });
+      }
+    }
+  }
+
+  terminateTaskSelectMenu(): void {
+    if (this.selectedTaskSettings != null) {
+      this.overlays.remove({ id: this.selectedTaskSettings });
+      this.selectedTaskSettings = null;
+    }
   }
 
   // Check if another element (compared to the input id) is being currently edited
@@ -222,9 +286,6 @@ export class ElementsHandler {
 
   // Check for unsaved changes on model
   areThereUnsavedChangesOnModel() {
-    if (this.attackerSettingsHandler.areThereUnsavedChanges()) {
-      return true;
-    }
     if (this.sensitiveAttributesHandler.areThereUnsavedChanges()) {
       return true;
     }

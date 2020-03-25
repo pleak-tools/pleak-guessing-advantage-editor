@@ -27,7 +27,7 @@ html, body, #canvas, #canvas > div {
     display: none;
 }
 
-.spinner, .analysis-spinner {
+.spinner, .analysis-spinner, .propagation-spinner {
   width: 40px;
   height: 40px;
   position: relative;
@@ -103,6 +103,15 @@ html, body, #canvas, #canvas > div {
 .highlight-input-selected:not(.djs-connection) .djs-visual > :nth-child(1), .highlight-input-selected:not(.djs-connection) .djs-visual > :nth-child(2) {
   fill: springgreen!important;
   stroke: green!important;
+}
+
+.highlight-task-selected:not(.djs-connection) .djs-visual > :nth-child(1) {
+  fill: springgreen!important;
+  stroke: green!important;
+}
+
+.highlight-task-selected:not(.djs-connection) .djs-label {
+  fill: green!important;
 }
 
 .highlight-input-output:not(.djs-connection) .djs-visual > :nth-child(1) {

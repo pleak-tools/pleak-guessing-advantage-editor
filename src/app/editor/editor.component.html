@@ -1,14 +1,14 @@
 <div class="row header-buttons">
   <div>
     <div class="row">
-      <div class="col-xs-5">
+      <div class="col-xs-4">
         <h4 class="editor-title">Pleak guessing advantage editor</h4>
       </div>
-      <div class="col-xs-7 buttons-container">
+      <div class="col-xs-8 buttons-container">
         <ul class="buttons">
           <li>
             <a id="change-editor" title="Change analyzer" data-toggle="modal" data-target="#changeAnalyzerModal" class="active">
-              <span class="glyphicon glyphicon-blackboard"></span> Change analyzer
+              <span class="glyphicon glyphicon-blackboard"></span> Change editor
             </a>
           </li>
         </ul>
@@ -19,10 +19,10 @@
             </a>
           </li>
         </ul>
-        <ul class="buttons analyze" *ngIf="isLoaded()">
+        <ul id="download-diagram-container" class="buttons hidden">
           <li>
-            <a class="active .analyze-button" id="analyze-diagram" title="analyze BPMN diagram" href="#">
-              <span class="glyphicon glyphicon-check"></span> Analyze
+            <a id="download-diagram" title="Download diagram (.bpmn)" href="#">
+              <span class="glyphicon glyphicon-cloud-download"></span> Export diagram
             </a>
           </li>
         </ul>
@@ -57,7 +57,21 @@
 <div id="canvas">
 </div>
 <div id="sidebar" *ngIf="isLoaded()">
-  <div id="input-options">
+  <div class="analysis-buttons-container">
+    <button class="btn btn-default" id="analyze-diagram"  style="margin-right:5px">Guessing Advantage analysis</button>
+
+    <button class="btn btn-default" id="propagate-diagram">Propagate intermediates</button>
+    <hr>
+  </div>
+  <div class="propagation-spinner-container">
+    <div class="propagation-spinner" style="display:none">
+      <div class="double-bounce1-2"></div>
+      <div class="double-bounce2-2"></div>
+    </div>
+  </div>
+  <div class="analysis-settings-container">
+    <div id="input-options">
+    </div>
   </div>
 </div>
 <div class="model-spinner" *ngIf="!isLoaded()">
@@ -70,22 +84,13 @@
     <div class="modal-content">
       <form>
         <div class="modal-header">
-          <h4>Change analyzer</h4>
+          <h4>Change editor</h4>
         </div>
         <div class="modal-body text-center">
           <ul class="buttons">
             <li>
-              <a class="active" href="/sql-privacy-editor/{{viewerType == 'public' ? 'viewer/' : ''}}{{modelId}}">
-                <span class="glyphicon glyphicon-transfer"></span> SQL Analyzer
-              </a>
-            </li>
-          </ul>
-          <br>
-          <br>
-          <ul class="buttons">
-            <li>
-              <a class="active" href="/sql-derivative-sensitivity-editor/{{viewerType == 'public' ? 'viewer/' : ''}}{{modelId}}">
-                <span class="glyphicon glyphicon-transfer"></span> SQL DS Analyzer
+              <a class="active" href="/sensitivities-editor/{{viewerType == 'public' ? 'viewer/' : ''}}{{modelId}}">
+                <span class="glyphicon glyphicon-transfer"></span> Sensitivities editor
               </a>
             </li>
           </ul>
@@ -94,7 +99,7 @@
           <ul class="buttons">
             <li>
               <a class="active" href="/pe-bpmn-editor/{{viewerType == 'public' ? 'viewer/' : ''}}{{modelId}}">
-                <span class="glyphicon glyphicon-transfer"></span> PE-BPMN Analyzer
+                <span class="glyphicon glyphicon-transfer"></span> PE-BPMN & Leaks-When editor
               </a>
             </li>
           </ul>
@@ -103,16 +108,7 @@
           <ul class="buttons">
             <li>
               <a>
-                <span class="glyphicon glyphicon-transfer"></span> Guessing Advantage Analyzer
-              </a>
-            </li>
-          </ul>
-          <br>
-          <br>
-          <ul class="buttons">
-            <li>
-              <a class="active" href="/combined-sensitivity-editor/{{viewerType == 'public' ? 'viewer/' : ''}}{{modelId}}">
-                <span class="glyphicon glyphicon-transfer"></span> Combined Sensitivity Analyzer
+                <span class="glyphicon glyphicon-transfer"></span> Guessing Advantage editor
               </a>
             </li>
           </ul>

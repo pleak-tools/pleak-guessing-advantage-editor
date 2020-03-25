@@ -3,7 +3,7 @@ import * as Viewer from 'bpmn-js/lib/NavigatedViewer';
 declare let $: any;
 declare let CodeMirror: any;
 
-declare function require(name:string);
+declare function require(name: string);
 let config = require('../../config.json');
 
 let attackerKnowledgeCodeMirror;
@@ -20,14 +20,14 @@ export class AttackerSettingsHandler {
     this.elementsHandler = parent;
     this.editor = parent.parent;
   }
-    
+
   viewer: Viewer;
   eventBus: any;
   registry: any;
   canvas: any;
   overlays: any;
   diagram: String;
-    
+
   editor: any;
   elementsHandler: any;
 
@@ -68,7 +68,7 @@ export class AttackerSettingsHandler {
     if ($('#sidebar').has('#attacker-settings-panel').length) {
       this.initAttackerSettingsPanel();
     } else {
-      $('#sidebar').append($('<div>').load(config.frontend.host + '/' + config.guessing_advantage_editor.folder + '/src/app/editor/templates/attacker-settings-panel.html', () => {
+      $('.analysis-settings-container').append($('<div>').load(config.frontend.host + '/' + config.guessing_advantage_editor.folder + '/src/app/editor/templates/attacker-settings-panel.html', () => {
         this.initAttackerSettingsPanel();
       }));
     }
@@ -94,7 +94,7 @@ export class AttackerSettingsHandler {
       attackerPriorKnowledge = "";
     }
     attackerKnowledgeCodeMirror.setValue(attackerPriorKnowledge);
-    setTimeout(function() {
+    setTimeout(function () {
       attackerKnowledgeCodeMirror.refresh();
     }, 10);
     this.initAttackerSettingsButtons();
@@ -135,7 +135,7 @@ export class AttackerSettingsHandler {
       if (root.businessObject.policyInfo != null) {
         sensitiveAttributes = JSON.parse(root.businessObject.policyInfo).sensitiveAttributes;
       }
-      let object = {attackerKnowledge: attackerKnowledge, sensitiveAttributes: sensitiveAttributes};
+      let object = { attackerKnowledge: attackerKnowledge, sensitiveAttributes: sensitiveAttributes };
       root.businessObject.policyInfo = JSON.stringify(object);
     }
   }

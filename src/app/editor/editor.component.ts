@@ -31,7 +31,7 @@ export class EditorComponent implements OnInit {
     }
     this.authService.authStatus.subscribe(status => {
       this.authenticated = status;
-      if (typeof(status) === 'boolean') {
+      if (typeof (status) === 'boolean') {
         this.getModel();
       }
     });
@@ -110,7 +110,7 @@ export class EditorComponent implements OnInit {
         this.file.user = response.user;
         this.file.md5Hash = response.md5Hash;
       },
-      () => {},
+      () => { },
       () => {
         self.openDiagram(self.file.content);
       }
@@ -144,7 +144,7 @@ export class EditorComponent implements OnInit {
     if ((this.authService.user && file.user) ? file.user.email === this.authService.user.email : false) { return true; }
     for (let pIx = 0; pIx < file.permissions.length; pIx++) {
       if (file.permissions[pIx].action.title === 'edit' &&
-      this.authService.user ? file.permissions[pIx].user.email === this.authService.user.email : false) {
+        this.authService.user ? file.permissions[pIx].user.email === this.authService.user.email : false) {
         return true;
       }
     }
@@ -166,7 +166,7 @@ export class EditorComponent implements OnInit {
       this.save();
     });
 
-    $('.buttons-container').on('click', '#analyze-diagram', (e) => {
+    $(document).on('click', '#analyze-diagram', (e) => {
       e.preventDefault();
       e.stopPropagation();
       elementsHandler.analysisHandler.loadAnalysisPanelTemplate();
@@ -204,6 +204,15 @@ export class EditorComponent implements OnInit {
         }
       }
     });
+
+    $(document).off('click', '#propagate-diagram');
+    $(document).on('click', '#propagate-diagram', (e) => {
+      e.preventDefault();
+      // e.stopPropagation();
+      elementsHandler.analysisHandler.runPropagationAnalysis((output) => {
+        elementsHandler.analysisHandler.propagateIntermediates(output);
+      });
+    });
   }
 
   removeEventHandlers() {
@@ -228,7 +237,7 @@ export class EditorComponent implements OnInit {
             console.log(err);
           } else {
             self.file.content = xml;
-            this.http.put(config.backend.host + '/rest/directories/files/' + self.fileId, self.file, AuthService.loadRequestOptions({observe: 'response'})).subscribe(
+            this.http.put(config.backend.host + '/rest/directories/files/' + self.fileId, self.file, AuthService.loadRequestOptions({ observe: 'response' })).subscribe(
               (response: HttpResponse<any>) => {
                 if (response.status === 200 || response.status === 201) {
                   const data = response.body;
@@ -247,7 +256,7 @@ export class EditorComponent implements OnInit {
                   self.fileId = data.id;
                   self.setChangesInModelStatus(true);
                 } else if (response.status === 401) {
-                   $('#loginModal').modal();
+                  $('#loginModal').modal();
                 }
               },
               fail => {
@@ -266,6 +275,33 @@ export class EditorComponent implements OnInit {
         $('#save-diagram').addClass('active');
       }
     }
+  }
+
+  initExportButton(): void {
+    this.loadExportButton();
+    $(document).off('click', '#download-diagram');
+    $(document).on('click', '#download-diagram', (e) => {
+      this.loadExportButton();
+    });
+
+  }
+
+  loadExportButton(): void {
+    this.viewer.saveXML(
+      {
+        format: true
+      },
+      (err: any, xml: string) => {
+        let encodedData = encodeURIComponent(xml);
+        if (xml) {
+          $('#download-diagram-container').removeClass('hidden');
+          $('#download-diagram').addClass('active').attr({
+            'href': 'data:application/bpmn20-xml;charset=UTF-8,' + encodedData,
+            'download': $('#fileName').text()
+          });
+        }
+      }
+    );
   }
 
   ngOnInit() {

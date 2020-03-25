@@ -6,10 +6,11 @@ declare let $: any;
 declare let jexcel: any;
 declare let CodeMirror: any;
 
-declare function require(name:string);
+declare function require(name: string);
 let config = require('../../config.json');
 
 let schemaCodeMirror;
+let constraintsCodeMirror;
 let DBJexcel;
 
 export class DataObjectHandler {
@@ -54,11 +55,32 @@ export class DataObjectHandler {
 
   getDataObjectInputSchema() {
     let inputSchema = "";
-    if (this.dataObject.sqlDataObjectInfo != null) {
-      let savedData = JSON.parse(this.dataObject.sqlDataObjectInfo);
-      inputSchema = savedData.inputSchema;
+    if (this.dataObject.sqlScript != null) {
+      inputSchema = this.dataObject.sqlScript;
+    }
+    if (inputSchema.length === 0) {
+      if (this.dataObject.sqlDataObjectInfo != null) {
+        let savedData = JSON.parse(this.dataObject.sqlDataObjectInfo);
+        if (savedData && savedData.inputSchema) {
+          inputSchema = savedData.inputSchema;
+        }
+      }
     }
     return inputSchema;
+  }
+
+  getDataObjectInputConstraints() {
+    let inputConstraints = "";
+    if (this.dataObject.sqlDataObjectInfo != null) {
+      let savedData = JSON.parse(this.dataObject.sqlDataObjectInfo);
+      inputConstraints = savedData.inputConstraints;
+    }
+    if (!inputConstraints || inputConstraints.length === 0) {
+      if (this.dataObject.attackerSettings != null) {
+        inputConstraints = this.dataObject.attackerSettings;
+      }
+    }
+    return inputConstraints;
   }
 
   initDataObjectOptionsEditProcess() {
@@ -66,7 +88,7 @@ export class DataObjectHandler {
   }
 
   areThereUnsavedDataObjectChanges() {
-    if (this.getDataObjectInputSchema() != schemaCodeMirror.getValue() || this.DBInputInitialValue.toString() != $('#DBinputTable').jexcel('getData', false).toString()) {
+    if (this.getDataObjectInputSchema() != schemaCodeMirror.getValue() || this.getDataObjectInputConstraints() != constraintsCodeMirror.getValue() || this.DBInputInitialValue.toString() != $('#DBinputTable').jexcel('getData', false).toString()) {
       return true;
     } else {
       return false;
@@ -112,12 +134,34 @@ export class DataObjectHandler {
     let savedData;
     let inputDB = [];
     let inputSchema = "";
+    let inputConstraints = "";
     if (this.dataObject.sqlDataObjectInfo != null) {
       savedData = JSON.parse(this.dataObject.sqlDataObjectInfo);
-      inputSchema = savedData.inputSchema;
+      // inputSchema = savedData.inputSchema;
+      inputConstraints = savedData.inputConstraints;
       inputDB = savedData.inputDB;
     }
-
+    if (!inputConstraints || inputConstraints.length === 0) {
+      if (this.dataObject.attackerSettings != null) {
+        inputConstraints = this.dataObject.attackerSettings;
+      }
+    }
+    if (!inputDB || inputDB.length === 0) {
+      if (this.dataObject.tableData != null) {
+        inputDB = this.dataObject.tableData;
+      }
+    }
+    if (this.dataObject.sqlScript != null) {
+      inputSchema = this.dataObject.sqlScript;
+    }
+    if (!inputSchema || inputSchema.length === 0) {
+      if (this.dataObject.sqlDataObjectInfo != null) {
+        let savedData = JSON.parse(this.dataObject.sqlDataObjectInfo);
+        if (savedData && savedData.inputSchema) {
+          inputSchema = savedData.inputSchema;
+        }
+      }
+    }
     $('.task-options-panel, .data-object-options-panel').find('.CodeMirror').remove();
     this.dataObjectOptionsPanelContainer.find('#data-object-schemaInput').val(inputSchema);
     schemaCodeMirror = CodeMirror.fromTextArea(document.getElementById("data-object-schemaInput"), {
@@ -132,15 +176,28 @@ export class DataObjectHandler {
     }
     schemaCodeMirror.setValue(inputSchema);
 
+    this.dataObjectOptionsPanelContainer.find('#data-object-constraintsInput').val(inputConstraints);
+    constraintsCodeMirror = CodeMirror.fromTextArea(document.getElementById("data-object-constraintsInput"), {
+      mode: "text/x-mysql",
+      readOnly: !this.elementsHandler.canEdit,
+      lineNumbers: false,
+      showCursorWhenSelecting: true,
+      lineWiseCopyCut: false
+    });
+    if (inputConstraints == null) {
+      inputConstraints = "";
+    }
+    constraintsCodeMirror.setValue(inputConstraints);
+
     $('.jexcel').remove();
     DBJexcel = null;
     DBJexcel = this.dataObjectOptionsPanelContainer.find('#DBinputTable');
     DBJexcel.jexcel({
       data: inputDB,
-      minDimensions: [10,7],
+      minDimensions: [10, 7],
       editable: this.elementsHandler.canEdit,
-      onselection: function() {
-        setTimeout(function() {
+      onselection: function () {
+        setTimeout(function () {
           $("#jexcel_contextmenu a:last-child").hide();
         }, 1);
       }
@@ -148,8 +205,9 @@ export class DataObjectHandler {
 
     this.DBInputInitialValue = $('#DBinputTable').jexcel('getData', false);
 
-    setTimeout(function() {
+    setTimeout(function () {
       schemaCodeMirror.refresh();
+      constraintsCodeMirror.refresh();
     }, 10);
 
     this.highlightDataObject();
@@ -158,7 +216,7 @@ export class DataObjectHandler {
     this.initDataObjectOptionsButtons();
     let optionsPanel = this.dataObjectOptionsPanelContainer;
     optionsPanel.detach();
-    $('#sidebar').prepend(optionsPanel);
+    $('.analysis-settings-container').prepend(optionsPanel);
     $('#sidebar').scrollTop(0);
     this.dataObjectOptionsPanelContainer.show();
 
@@ -169,8 +227,23 @@ export class DataObjectHandler {
     let inputSchema, inputDB = "";
     if (this.dataObject.sqlDataObjectInfo != null) {
       savedData = JSON.parse(this.dataObject.sqlDataObjectInfo);
-      inputSchema = savedData.inputSchema;
       inputDB = savedData.inputDB;
+    }
+    if (!inputDB || inputDB.length === 0) {
+      if (this.dataObject.tableData != null) {
+        inputDB = this.dataObject.tableData;
+      }
+    }
+    if (this.dataObject.sqlScript != null) {
+      inputSchema = this.dataObject.sqlScript;
+    }
+    if (!inputSchema || inputSchema.length === 0) {
+      if (this.dataObject.sqlDataObjectInfo != null) {
+        let savedData = JSON.parse(this.dataObject.sqlDataObjectInfo);
+        if (savedData && savedData.inputSchema) {
+          inputSchema = savedData.inputSchema;
+        }
+      }
     }
     if (inputDB) {
       let DBOutput = "";
@@ -183,8 +256,27 @@ export class DataObjectHandler {
       }
       DBOutput = DBOutput.trim();
       let name = this.dataObject.name.trim().replace(/ *\([^)]*\) */g, "").replace(/\s+/g, "_");
-      return {id: this.dataObject.id, name: name, db: DBOutput, schema: schemaOutput};
+      return { id: this.dataObject.id, name: name, db: DBOutput, schema: schemaOutput };
     }
+  }
+
+  getPreparedConstraints() {
+    let inputConstraints = "";
+    if (this.dataObject.sqlDataObjectInfo != null) {
+      let savedData = JSON.parse(this.dataObject.sqlDataObjectInfo);
+      inputConstraints = savedData.inputConstraints;
+    }
+    if (!inputConstraints || inputConstraints.length === 0) {
+      if (this.dataObject.attackerSettings != null) {
+        inputConstraints = this.dataObject.attackerSettings;
+      }
+    }
+    if (inputConstraints && inputConstraints.length > 0) {
+      let tableName = this.dataObject.name ? this.dataObject.name.toLowerCase().replace(' ', '_') : "undefined";
+      inputConstraints = inputConstraints.split('\n').join(`\n${tableName}.`);
+      inputConstraints = `${tableName}.${inputConstraints}`;
+    }
+    return inputConstraints;
   }
 
   loadDataObjectOptionsPanelTemplate() {
@@ -215,6 +307,7 @@ export class DataObjectHandler {
   updateDataObjectOptions() {
     let inputNRM = this.getDataObjectInputNRM();
     let inputSchema = schemaCodeMirror.getValue();
+    let inputConstraints = constraintsCodeMirror.getValue();
     let inputDB = $('#DBinputTable').jexcel('getData', false);
     let cleanedInputDB = [];
     for (let row of inputDB) {
@@ -228,8 +321,9 @@ export class DataObjectHandler {
         cleanedInputDB.push(cleanedRow);
       }
     }
-    let object = {inputNRM: inputNRM, inputDB: cleanedInputDB, inputSchema: inputSchema};
+    let object = { inputNRM: inputNRM, inputDB: cleanedInputDB, inputSchema: inputSchema, inputConstraints: inputConstraints };
     this.dataObject.sqlDataObjectInfo = JSON.stringify(object);
+    this.dataObject.sqlScript = schemaCodeMirror.getValue();
   }
 
   saveDataObjectOptions() {
@@ -237,7 +331,7 @@ export class DataObjectHandler {
     this.terminateDataObjectOptionsEditProcess();
     this.setNewModelContentVariableContent();
   }
-  
+
   removeDataObjectOptions() {
     this.terminateDataObjectOptionsEditProcess();
     delete this.dataObject.sqlDataObjectInfo;

@@ -21,6 +21,28 @@
         </div>
         <hr>
         <div class="row">
+            <div class="col-md-10 col-md-offset-1">
+                <span id="enable-advanced-settings" class="clickable" >Enable advanced settings</span>
+                <span id="disable-advanced-settings" class="clickable" style="display: none;">Disable advanced settings</span>
+            </div>
+        </div>
+        <hr>
+        <div id="advanced-settings" style="opacity: 0.4;">
+          <div class="row" style="text-align: right">
+            <div class="col-md-6">
+              <div class="form-group" id="beta-input-form-group">
+                <label class="text-16" for="beta-input">Smoothness level &beta;</label>
+                <br/>0 &lt; &beta; &lt; &epsilon;/5
+                <br/>smaller &beta; gives less noise
+              </div>
+            </div>
+            <div class="col-md-6 text-left">
+              <input class="beta-toggle" type="checkbox" checked data-toggle="toggle">
+              <input class="form-control beta-input" type="number" id="beta-input" value="0.1" step="0.1" style="margin-top:10px" disabled="disabled"/>
+            </div>
+          </div>
+          <hr>
+          <div class="row">
             <div class="col-md-6 text-right">
                 <div class="form-group" id="estimated-noise-input-form-group">
                     <label class="text-16" for="estimated-noise-input">Confidence level of estimated noise</label>
@@ -29,29 +51,20 @@
             <div class="col-md-6 text-left">
                 <span id="estimated-noise-label">90</span>%
             </div>
-        </div>
-        <div class="row">
-            <div class="col-md-10 col-md-offset-1">
-                <input type="range" id="estimated-noise-input" value="0.9" min="0.0" max="1.0"
-                       step="0.01">
-            </div>
-        </div>
-        <hr>
-
-        <div class="row">
-            <div class="col-md-10 col-md-offset-1">
-                <span id="enable-advanced-settings" class="clickable" >Enable advanced settings</span>
-                <span id="disable-advanced-settings" class="clickable" style="display: none;">Disable advanced settings</span>
-            </div>
-        </div>
-        <hr>
-        <div id="advanced-settings" style="opacity: 0.4;">
+          </div>
+          <div class="row">
+              <div class="col-md-10 col-md-offset-1">
+                  <input type="range" id="estimated-noise-input" value="0.9" min="0.0" max="1.0"
+                        step="0.01" disabled="disabled">
+              </div>
+          </div>
+          <hr>
             <div class="row">
                 <div class="col-md-6 text-right">
                     <label class="text-16" for="sigmoid-smoothness-input">Sigmoid smoothness</label>
                 </div>
                 <div class="col-md-6 text-left">
-                    <input type="number" name="" id="sigmoid-smoothness-input" value="0.01" step="0.01" min="0" disabled="disabled">
+                    <input type="number" name="" id="sigmoid-smoothness-input" value="0.000001" step="0.000001" min="0" disabled="disabled">
                 </div>
             </div>
             <hr>
@@ -86,10 +99,6 @@
         </div>
         <div class="row">
             <div class="col-md-12">
-                <button id="attacker-settings-button" type="button" class="btn btn-default" style="margin-top:10px">
-                    Table Constraints
-                </button>
-                &nbsp;
                 <button id="sensitive-attributes-button" type="button" class="btn btn-default" style="margin-top:10px">
                     Attacker goal
                 </button>
