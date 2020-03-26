@@ -217,36 +217,49 @@ export class AnalysisHandler {
               let schema = dataObjectQueries.schema + '\n';
               schemasQuery += schema;
             }
-            constraints += this.elementsHandler.getDataObjectHandlerByDataObjectId(inputId).getPreparedConstraints() + '\n';
+            if (this.elementsHandler.getDataObjectHandlerByDataObjectId(inputId) && this.elementsHandler.getDataObjectHandlerByDataObjectId(inputId).getPreparedConstraints()) {
+              constraints = constraints + this.elementsHandler.getDataObjectHandlerByDataObjectId(inputId).getPreparedConstraints() + '\n';
+            }
           }
         }
       }
-      fullQuery = query; // query.toLowerCase().indexOf('insert into') === -1 ? 'INSERT INTO ' + taskName + ' ' + query : query;
-      // fullQuery = 'INSERT INTO ' + taskName + ' ' + query;
+      fullQuery = query;
       this.analysisInput.queries += fullQuery + '\n\n';
       this.analysisInput.schemas += schemasQuery;
+      this.analysisInput.attackerSettings += constraints;
+
       this.analysisInputTasksOrder.push({ id: taskId, order: Math.abs(counter - amount) });
       this.canvas.removeMarker(taskId, 'highlight-general-error');
       if (counter === 1) {
         if (this.analysisErrors.length === 0) {
-          this.analysisInput.queries.trim();
+          this.analysisInput.queries = this.analysisInput.queries.trim();
           this.analysisInput.epsilon = Number.parseFloat($('.advantage-input').val());
           this.analysisInput.beta = $('.beta-input').attr('disabled') ? -1 : Number.parseFloat($('.beta-input').val());
           if (Number.parseInt($('.allowed-queries').val()) <= 0) {
             $('.allowed-queries').val(1);
           }
           this.analysisInput.numberOfQueries = $('.allowed-queries').attr('disabled') ? 1 : Number.parseInt($('.allowed-queries').val());
-          this.analysisInput.attackerSettings = constraints; // this.elementsHandler.attackerSettingsHandler.getAttackerSettings();
           this.analysisInput.sensitiveAttributes = this.elementsHandler.sensitiveAttributesHandler.getSensitiveAttributes();
 
-          this.analysisInput.errorUB = $('#estimated-noise-input').attr('disabled') ? -1 : Number.parseFloat($('#estimated-noise-input').val());
+          this.analysisInput.errorUB = $('#estimated-noise-input').attr('disabled') ? 0.9 : Number.parseFloat($('#estimated-noise-input').val());
           this.analysisInput.sigmoidBeta = $('#sigmoid-smoothness-input').attr('disabled') ? -1 : Number.parseFloat($('#sigmoid-smoothness-input').val());
           this.analysisInput.sigmoidPrecision = $('#sigmoid-precision-input').attr('disabled') ? -1 : Number.parseFloat($('#sigmoid-precision-input').val());
           this.analysisInput.dateStyle = $('#datestyle-input').attr('disabled') ? -1 : $('#datestyle-input').val();
 
           $('.analysis-spinner').fadeIn();
           $('#analysis-results-panel-content').html('');
-          this.runAnalysisREST(this.analysisInput);
+
+          const modelId = this.elementsHandler.parent.modelId;
+          const modelName = $('#fileName').text().substring(0, $('#fileName').text().length - 5).trim().replace(' ', '_');
+          const serverPetriFileName = modelId.trim() + '_' + modelName.trim();
+          this.sendSqlCleanRequest(serverPetriFileName, this.analysisInput.schemas, this.analysisInput.queries, (cleanSql) => {
+            if (cleanSql != "error") {
+              this.analysisInput.queries = cleanSql;
+              this.runAnalysisREST(this.analysisInput);
+            } else {
+              alert("failed"); // TODO
+            }
+          });
         } else {
           this.showAnalysisErrorResults();
         }
@@ -320,7 +333,7 @@ export class AnalysisHandler {
                   <td>` + this.analysisResult[1] + `</td>
                 </tr>
                 <tr>
-                  <td style="text-align: left;"><strong>` + Math.round(this.analysisInput.errorUB * 100) + `%-realtive error |a|/|y|</strong></td>
+                  <td style="text-align: left;"><strong>` + Math.round(this.analysisInput.errorUB * 100) + `%-relative error |a|/|y|</strong></td>
                   <td>` + this.analysisResult[2] + `</td>
                 </tr>
               </tbody>
@@ -467,7 +480,12 @@ export class AnalysisHandler {
   // START Propagation
 
   propagateIntermediates(propagationResponse: any): void {
-    console.log("success");
+    if (propagationResponse.commandError) {
+      alert('Propagation failed'); // TODO
+      console.log(propagationResponse.commandError);
+      $('.propagation-spinner').hide();
+      return;
+    }
     for (var i in this.registry._elements) {
       var node = this.registry._elements[i].element;
 
@@ -497,20 +515,12 @@ export class AnalysisHandler {
             node.businessObject.isPropagated = true;
           }
         }
-        if (propagationResponse.commandError) {
-          console.log("propagation error");
-          console.log(propagationResponse.commandError);
-          // $('#propServerError').show();
-          // $('#propServerError').text(propagationResponse.commandError);
-        } else {
-          // $('#propServerError').hide();
-        }
       }
     }
-    $('.propagation-spinner').hide();
-    alert("propagation successful");
     this.setNewModelContentVariableContent();
     this.setChangesInModelStatus(true);
+    $('.propagation-spinner').fadeOut();
+    alert('Propagation successful');
   }
 
   runPropagationAnalysis(callback) {
@@ -554,7 +564,7 @@ export class AnalysisHandler {
     let petriNetArray = Object.values(petriNet);
     this.removePetriMarks();
 
-    const modelId = this.elementsHandler.parent.modelId; // TODO - get it somehow else?
+    const modelId = this.elementsHandler.parent.modelId;
     const modelName = $('#fileName').text().substring(0, $('#fileName').text().length - 5).trim().replace(' ', '_');
 
     const serverPetriFileName = modelId.trim() + '_' + modelName.trim();
@@ -636,8 +646,9 @@ export class AnalysisHandler {
             });
           }
 
-          if (node.businessObject.sqlScript)
+          if (node.businessObject.sqlScript) {
             queries.push(node.businessObject.sqlScript);
+          }
 
           schemas = schemas.concat(tempSchemas);
           attackerSettings = attackerSettings.concat(tempAttackerSettings);
@@ -645,14 +656,20 @@ export class AnalysisHandler {
       }
     }
 
-    this.sendSqlCleanRequest(serverPetriFileName, schemas, queries, (cleanSql) => {
-      this.sendPropagationRequest(serverPetriFileName, JSON.stringify(petriNetArray), matcher, intermediates, schemas, queries, tableDatas, attackerSettings, cleanSql, (output) => callback(output));
+    this.sendSqlCleanRequest(serverPetriFileName, schemas.join('\n'), queries.join('\n'), (cleanSql) => {
+      if (cleanSql != "error") {
+        this.sendPropagationRequest(serverPetriFileName, JSON.stringify(petriNetArray), matcher, intermediates, schemas, queries, tableDatas, attackerSettings, cleanSql, (output) => callback(output));
+      } else {
+        console.log("sql clean request error");
+        $('.propagation-spinner').hide();
+        alert('Propagation failed'); // TODO
+      }
     });
   }
 
   sendSqlCleanRequest(diagramId, schemas, queries, callback) {
     const apiURL = config.leakswhen.host + config.leakswhen.adapt;
-    return this.editor.http.post(apiURL, { diagram_id: diagramId, sql_script: queries.join('\n'), sql_schema: schemas.join('\n'), target: "result" })
+    return this.editor.http.post(apiURL, { diagram_id: diagramId, sql_script: queries, sql_schema: schemas, target: "result" })
       .toPromise()
       .then(
         (res: any) => {
@@ -661,10 +678,7 @@ export class AnalysisHandler {
           return true;
         },
         err => {
-          console.log("sql clean request error");
-          // $('#leaksWhenServerError').show();
-          // $('#analysis-results-panel').hide();
-          // $('.analysis-spinner').hide();
+          callback("error");
           return true;
         });
   }
@@ -708,9 +722,8 @@ export class AnalysisHandler {
                 },
                 err => {
                   console.log("propagate request error");
-                  // $('#leaksWhenServerError').show();
-                  // $('#analysis-results-panel').hide();
-                  // $('.analysis-spinner').hide();
+                  $('.propagation-spinner').hide();
+                  alert('Propagation failed'); // TODO
                   return true;
                 });
           }), Promise.resolve());
