@@ -7,6 +7,9 @@
     "port": 8000,
     "folder": "pleak-frontend"
   },
+  "pe_bpmn_editor": {
+    "folder": "pleak-pe-bpmn-editor"
+  },
   "leakswhen": {
     "host": "http://localhost:3000",
     "report": "/upload",
@@ -14,6 +17,10 @@
     "adapt": "/adapt-sql",
     "multi_runs": true
   },
+  "sql_sensitivities_editor": {
+    "folder": "pleak-sensitivities-editor"
+  },
   "guessing_advantage_editor": {
     "folder": "pleak-guessing-advantage-editor"
+  }
 }
