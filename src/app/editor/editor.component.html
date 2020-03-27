@@ -74,7 +74,7 @@
     </div>
   </div>
 
-  <div id="resize-buttons-container" *ngIf="isLoaded()">
+  <div id="resize-buttons-container" [class.hidden]="!isLoaded()">
     <span id="resize-buttons-label">Sidebar width:</span>
     <button class="btn btn-default" id="resize-dec">-</button>
     <button class="btn btn-default" id="resize-inc">+</button>
