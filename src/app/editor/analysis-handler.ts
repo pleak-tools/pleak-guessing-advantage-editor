@@ -287,7 +287,7 @@ export class AnalysisHandler {
 
   // Call to the analyser
   runAnalysisREST(postData: any) {
-    this.editor.http.post(config.backend.host + '/rest/sql-privacy/analyze-guessing-advantage', postData, AuthService.loadRequestOptions({ observe: 'response' })).subscribe(
+    this.editor.http.post(config.backend.host + '/rest/guessing-advantage/guessing-advantage-analysis', postData, AuthService.loadRequestOptions({ observe: 'response' })).subscribe(
       success => {
         this.formatAnalysisResults(success);
       },

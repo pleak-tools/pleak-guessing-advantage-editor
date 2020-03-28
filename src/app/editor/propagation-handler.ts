@@ -257,7 +257,7 @@ export class PropagationHandler {
   }
 
   sendPropagationRequest(diagramId, petri, matcher, intermediates, schemas, queries, tableDatas, attackerSettings, cleanSql, callback) {
-    let apiURL = config.backend.host + '/rest/sql-privacy/propagate';
+    let apiURL = config.backend.host + '/rest/guessing-advantage/sql-propagation';
     let petriURL = config.leakswhen.host + config.leakswhen.compute;
 
     return this.editor.http.post(petriURL, { diagram_id: diagramId, petri: petri })
