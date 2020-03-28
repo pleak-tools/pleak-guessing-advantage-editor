@@ -5,6 +5,7 @@ import { TaskHandler } from "./task-handler";
 import { DataObjectHandler } from "./data-object-handler";
 import { SensitiveAttributesHandler } from './sensitive-attributes-handler';
 import { EditorComponent } from './editor.component';
+import { PropagationHandler } from './propagation-handler';
 
 declare let $: any;
 let is = (element, type) => element.$instanceOf(type);
@@ -36,6 +37,8 @@ export class ElementsHandler {
 
   sensitiveAttributesHandler: SensitiveAttributesHandler;
 
+  propagationHandler: PropagationHandler;
+
   taskHandlers: TaskHandler[] = [];
   dataObjectHandlers: DataObjectHandler[] = [];
 
@@ -57,7 +60,6 @@ export class ElementsHandler {
       this.eventBus.on('element.click', (e) => {
 
         // Selecting dataObjects and dataStores for SQL leaks-when analysis
-        this.initTaskSelectMenu(e.element);
 
         if (is(e.element.businessObject, 'bpmn:Task') || is(e.element.businessObject, 'bpmn:DataObjectReference') || is(e.element.businessObject, 'bpmn:DataStoreReference')) {
           this.canvas.removeMarker(e.element.id, 'selected');
@@ -85,6 +87,7 @@ export class ElementsHandler {
             if (toBeEditedelementHandler.length > 0) {
               toBeEditedelementHandler[0].initTaskOptionsEditProcess();
             }
+            this.initTaskSelectMenu(e.element);
           } else if (is(e.element.businessObject, 'bpmn:DataObjectReference') || is(e.element.businessObject, 'bpmn:DataStoreReference')) {
             toBeEditedelementHandler = this.dataObjectHandlers.filter(function (obj) {
               return obj.dataObject == e.element.businessObject && obj.beingEdited == false;
@@ -99,6 +102,7 @@ export class ElementsHandler {
     });
     this.analysisHandler = new AnalysisHandler(this.viewer, this.diagram, this);
     this.sensitiveAttributesHandler = new SensitiveAttributesHandler(this.viewer, this.diagram, this);
+    this.propagationHandler = new PropagationHandler(this.viewer, this.diagram, this);
     this.prepareParser();
   }
 

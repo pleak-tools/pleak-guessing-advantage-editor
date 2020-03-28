@@ -205,12 +205,11 @@ export class EditorComponent implements OnInit {
       }
     });
 
-    $(document).off('click', '#propagate-diagram');
+    // $(document).off('click', '#propagate-diagram');
     $(document).on('click', '#propagate-diagram', (e) => {
       e.preventDefault();
-      elementsHandler.analysisHandler.runPropagationAnalysis((output) => {
-        elementsHandler.analysisHandler.propagateIntermediates(output);
-      });
+      e.stopPropagation();
+      elementsHandler.propagationHandler.initPropagation();
     });
 
     $(window).resize(() => {

@@ -68,7 +68,7 @@ export class SensitiveAttributesHandler {
     if ($('#sidebar').has('#sensitive-attributes-panel').length) {
       this.initSensitiveAttributesPanel();
     } else {
-      $('.analysis-settings-container').append($('<div>').load(config.frontend.host + '/' + config.guessing_advantage_editor.folder + '/src/app/editor/templates/sensitive-attributes-panel.html', () => {
+      $('.guessing-advantage-analysis-panels').append($('<div>').load(config.frontend.host + '/' + config.guessing_advantage_editor.folder + '/src/app/editor/templates/sensitive-attributes-panel.html', () => {
         this.initSensitiveAttributesPanel();
       }));
     }
