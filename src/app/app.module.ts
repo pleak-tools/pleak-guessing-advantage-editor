@@ -5,16 +5,18 @@ import { HttpClientModule } from '@angular/common/http';
 
 import { AppComponent } from './app.component';
 import { EditorComponent } from './editor/editor.component';
+import { ScriptModalComponent } from './editor/script-modal/script-modal.component';
 
 import { AuthService} from './auth/auth.service';
 import { ToastrModule } from 'ngx-toastr';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
-
+import { CodemirrorModule } from '@ctrl/ngx-codemirror';
 
 @NgModule({
   declarations: [
     AppComponent,
-    EditorComponent
+    EditorComponent,
+    ScriptModalComponent
   ],
   imports: [
     NoopAnimationsModule,
@@ -25,7 +27,9 @@ import { NoopAnimationsModule } from '@angular/platform-browser/animations';
       timeOut: 5000,
       positionClass: 'toast-bottom-right',
       preventDuplicates: true,
-    })
+    }),
+    CodemirrorModule
+
   ],
   providers: [AuthService],
   bootstrap: [AppComponent]

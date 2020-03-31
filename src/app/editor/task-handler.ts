@@ -185,17 +185,21 @@ export class TaskHandler {
 
   initTaskOptionsButtons() {
     this.terminateTaskOptionsButtons();
-    this.taskOptionsPanelContainer.one('click', '#task-options-save-button', (e) => {
+    this.taskOptionsPanelContainer.one('click', '#task-options-save-button', () => {
       this.saveTaskOptions();
     });
-    this.taskOptionsPanelContainer.on('click', '#task-options-hide-button', (e) => {
+    this.taskOptionsPanelContainer.on('click', '#task-options-hide-button', () => {
       this.checkForUnsavedTaskChangesBeforeTerminate();
+    });
+    this.taskOptionsPanelContainer.on('click', '#task-script-fullscreen', () => {
+      this.elementsHandler.parent.openScriptModal(taskQueryMirror.getValue(), (this.task.name ? this.task.name : "unnamed") + " - Edit SQL script", 'task', this.task.id);
     });
   }
 
   terminateTaskOptionsButtons() {
     this.taskOptionsPanelContainer.off('click', '#task-options-save-button');
     this.taskOptionsPanelContainer.off('click', '#task-options-hide-button');
+    this.taskOptionsPanelContainer.off('click', '#task-script-fullscreen');
   }
 
   updateTaskOptions() {
@@ -226,6 +230,12 @@ export class TaskHandler {
         this.updateModelContentVariable(xml);
       }
     );
+  }
+
+  setSQLScriptValue(script: string): void {
+    if (script) {
+      taskQueryMirror.setValue(script);
+    }
   }
 
   // Highlight inputs and outputs of the task

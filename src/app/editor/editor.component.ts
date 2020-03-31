@@ -1,4 +1,4 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input, ViewChild } from '@angular/core';
 import { AuthService } from '../auth/auth.service';
 import { SqlBPMNModdle } from './bpmn-labels-extension';
 import NavigatedViewer from 'bpmn-js/lib/NavigatedViewer';
@@ -40,6 +40,8 @@ export class EditorComponent implements OnInit {
 
   @Input() authenticated: Boolean;
 
+  @ViewChild('scriptModal', { static: false }) scriptModal: any;
+
   public loaded = false;
 
   private viewer: NavigatedViewer;
@@ -54,6 +56,8 @@ export class EditorComponent implements OnInit {
   private file: any;
 
   private lastModified: Number = null;
+
+  elementsHandler: any;
 
   isAuthenticated() {
     return this.authenticated;
@@ -132,6 +136,7 @@ export class EditorComponent implements OnInit {
       });
 
       const elementsHandler = new ElementsHandler(this.viewer, diagram, pg_parser, this, this.canEdit());
+      this.elementsHandler = elementsHandler;
 
       this.addEventHandlers(elementsHandler);
     }
@@ -361,6 +366,42 @@ export class EditorComponent implements OnInit {
         }
       }
     });
+  }
+
+  openScriptModal(script: string, name: string, type: string, elementId: string): void {
+    this.scriptModal.openModal(JSON.stringify({ name: name, value: script, type: type, id: elementId }));
+  }
+
+  setScript(scriptObj: any): void {
+    let info = JSON.parse(scriptObj);
+    if (info) {
+      if (info.type == "task") {
+        let taskHandler = this.elementsHandler.getTaskHandlerByTaskId(info.id);
+        if (taskHandler) {
+          taskHandler.setSQLScriptValue(info.value);
+        }
+      } else if (info.type == "do") {
+        let doHandler = this.elementsHandler.getDataObjectHandlerByDataObjectId(info.id);
+        if (doHandler) {
+          doHandler.setSchemaInputValue(info.value);
+        }
+      }
+    }
+  }
+
+  saveScript(scriptObj: string): void {
+    let info = JSON.parse(scriptObj);
+    if (info.type == "task") {
+      let taskHandler = this.elementsHandler.getTaskHandlerByTaskId(info.id);
+      if (taskHandler) {
+        taskHandler.saveTaskOptions();
+      }
+    } else if (info.type == "do") {
+      let doHandler = this.elementsHandler.getDataObjectHandlerByDataObjectId(info.id);
+      if (doHandler) {
+        doHandler.saveDataObjectOptions();
+      }
+    }
   }
 
 }
