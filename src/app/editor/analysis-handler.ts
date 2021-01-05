@@ -328,6 +328,7 @@ export class AnalysisHandler {
     if (this.analysisResult) {
       let resultsHtml = '';
 
+      //the first three rows are visible immediately
       resultsHtml += `
       <div class="" id="general-analysis-results">
         <div class="panel panel-default">
@@ -338,66 +339,33 @@ export class AnalysisHandler {
             <table style="width:100%;text-align:right">
               <tbody>
                 <tr>
-                  <td style="text-align: left;"><strong>actual outputs y</strong></td>
-                  <td>` + this.analysisResult[0] + `</td>
-                </tr>
-                <tr>
-                  <td style="text-align: left;"><strong>` + Math.round(this.analysisInput.errorUB * 100) + `%-noise magnitude a</strong></td>
+                  <td style="text-align: left;"><strong>` + this.analysisResult[0] + `</strong></td>
                   <td>` + this.analysisResult[1] + `</td>
                 </tr>
                 <tr>
-                  <td style="text-align: left;"><strong>` + Math.round(this.analysisInput.errorUB * 100) + `%-relative error |a|/|y|</strong></td>
-                  <td>` + this.analysisResult[2] + `</td>
+                  <td style="text-align: left;"><strong>` + this.analysisResult[2] + `</strong></td>
+                  <td>` + this.analysisResult[3] + `</td>
+                </tr>
+                <tr>
+                  <td style="text-align: left;"><strong>` + this.analysisResult[4] + `</strong></td>
+                  <td>` + this.analysisResult[5] + `</td>
                 </tr>
               </tbody>
             </table>
             <div class="view-more-results-div" style="display:block;text-align:right;margin-top:10px;margin-bottom:10px"><span class="more-results-link">View more</span></div>
             <table style="width:100%;text-align:right;display:none" class="more-analysis-results">
-              <tbody>
+              <tbody>`
+
+      //the remaining rows occur when "view more" is clicked
+      for (let j = 6; j < this.analysisResult.length; j += 2) {
+          resultsHtml += `
                 <tr>
-                  <td style="text-align: left;"><strong>Cauchy (default) distribution</strong></td>
-                  <td>` + this.analysisResult[3] + `</td>
-                </tr>
-                <tr>
-                  <td style="text-align: left;"><strong>prior (worst instance)</strong></td>
-                  <td>` + this.analysisResult[4] + `</td>
-                </tr>
-                <tr>
-                  <td style="text-align: left;"><strong>posterior (worst instance)</strong></td>
-                  <td>` + this.analysisResult[5] + `</td>
-                </tr>
-                <tr>
-                  <td style="text-align: left;"><strong>DP epsilon</strong></td>
-                  <td>` + this.analysisResult[6] + `</td>
-                </tr>
-                <tr>
-                  <td style="text-align: left;"><strong>smoothness beta</strong></td>
-                  <td>` + this.analysisResult[7] + `</td>
-                </tr>
-                 <tr>
-                  <td style="text-align: left;"><strong>(epsilon,delta) for Laplace noise</strong></td>
-                  <td>` + this.analysisResult[8] + `</td>
-                </tr>
-                 <tr>
-                  <td style="text-align: left;"><strong>norm N</strong></td>
-                  <td>` + this.analysisResult[9] + `</td>
-                </tr>
-                 <tr>
-                  <td style="text-align: left;"><strong>beta-smooth sensitivity</strong></td>
-                  <td>` + this.analysisResult[10] + `</td>
-                </tr>
-                 <tr>
-                  <td style="text-align: left;"><strong>` + Math.round(this.analysisInput.errorUB * 100) + `%-noise magnitude (Laplace)</strong></td>
-                  <td>` + this.analysisResult[11] + `</td>
-                </tr>
-                 <tr>
-                  <td style="text-align: left;"><strong>` + Math.round(this.analysisInput.errorUB * 100) + `%-realtive error (Laplace)</strong></td>
-                  <td>` + this.analysisResult[12] + `</td>
-                </tr>
-                 <tr>
-                  <td style="text-align: left;"><strong>Laplace noise distribution</strong></td>
-                  <td>` + this.analysisResult[13] + `</td>
-                </tr>
+                  <td style="text-align: left;"><strong>` + this.analysisResult[j] + `</strong></td>
+                  <td>` + this.analysisResult[j+1] + `</td>
+                </tr>`
+      }
+
+      resultsHtml += `
               </tbody>
             </table>
           </div>
