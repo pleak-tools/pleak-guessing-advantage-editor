@@ -354,7 +354,7 @@ export class AnalysisHandler {
             </table>
             <div class="view-more-results-div" style="display:block;text-align:right;margin-top:10px;margin-bottom:10px"><span class="more-results-link">View more</span></div>
             <table style="width:100%;text-align:right;display:none" class="more-analysis-results">
-              <tbody>`
+              <tbody>`;
 
       //the remaining rows occur when "view more" is clicked
       for (let j = 6; j < this.analysisResult.length; j += 2) {
@@ -362,7 +362,7 @@ export class AnalysisHandler {
                 <tr>
                   <td style="text-align: left;"><strong>` + this.analysisResult[j] + `</strong></td>
                   <td>` + this.analysisResult[j+1] + `</td>
-                </tr>`
+                </tr>`;
       }
 
       resultsHtml += `
