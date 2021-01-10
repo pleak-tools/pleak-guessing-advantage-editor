@@ -328,7 +328,7 @@ export class AnalysisHandler {
     if (this.analysisResult) {
       let resultsHtml = '';
 
-      //the first three rows are visible immediately
+      //the first four rows are visible immediately
       resultsHtml += `
       <div class="" id="general-analysis-results">
         <div class="panel panel-default">
@@ -350,6 +350,10 @@ export class AnalysisHandler {
                   <td style="text-align: left;"><strong>` + this.analysisResult[4] + `</strong></td>
                   <td>` + this.analysisResult[5] + `</td>
                 </tr>
+                <tr>
+                  <td style="text-align: left;"><strong>` + this.analysisResult[6] + `</strong></td>
+                  <td>` + this.analysisResult[7] + `</td>
+                </tr>
               </tbody>
             </table>
             <div class="view-more-results-div" style="display:block;text-align:right;margin-top:10px;margin-bottom:10px"><span class="more-results-link">View more</span></div>
@@ -357,7 +361,7 @@ export class AnalysisHandler {
               <tbody>`;
 
       //the remaining rows occur when "view more" is clicked
-      for (let j = 6; j < this.analysisResult.length; j += 2) {
+      for (let j = 8; j < this.analysisResult.length; j += 2) {
           resultsHtml += `
                 <tr>
                   <td style="text-align: left;"><strong>` + this.analysisResult[j] + `</strong></td>
