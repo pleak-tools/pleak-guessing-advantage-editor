@@ -20,7 +20,7 @@
     "@angular/platform-browser-dynamic": "^8.2.13",
     "@angular/router": "^8.2.13",
     "@ctrl/ngx-codemirror": "^2.2.1",
-    "exports-loader": "^0.7.0",
+    "exports-loader": "^4.0.0",
     "bootstrap": "3.4.1",
     "bootstrap-toggle": "^2.2.2",
     "bpmn-js": "5.0.4",
@@ -40,7 +40,7 @@
     "zone.js": "~0.9.1"
   },
   "devDependencies": {
-    "@angular-devkit/build-angular": "~0.803.5",
+    "@angular-devkit/build-angular": "~15.0.4",
     "@angular/cli": "^8.3.17",
     "@angular/compiler-cli": "^8.2.13",
     "@angular/language-service": "^8.2.13",
